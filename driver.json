@@ -1,0 +1,42 @@
+{
+  "driver_id": "integration-awol-valerion",
+  "version": "0.0.1",
+  "min_core_api": "0.20.0",
+  "name": {
+    "en": "AWOL Valerion"
+  },
+  "icon": "uc:projector",
+  "description": {
+    "en": "Control your AWOL Valerion projector.",
+    "de": "Steuere deinen AWOl Valerion Projektor."
+  },
+  "developer": {
+    "name": "Tino Goratsch",
+    "email": "mail@goratschwebdesign.de",
+    "url": "https://github.com/tinogo"
+  },
+  "home_page": "https://github.com/tinogo/uc-intg-awol-valerion",
+  "setup_data_schema": {
+    "title": {
+      "en": "Integration setup",
+      "de": "Integrationssetup"
+    },
+    "settings": [
+      {
+        "id": "info",
+        "label": {
+          "en": "Integration setup",
+          "de": "Integrationssetup"
+        },
+        "field": {
+          "label": {
+            "value": {
+              "en": "This integration allows you to control your AWOL Valerion projector from your Unfolded Circle Remote.",
+              "de": "Diese Integration erlaubt die Steuerung deines AWOL Valerion Projektors mit deiner Unfolded Circle Remote."
+            }
+          }
+        }
+      }
+    ]
+  }
+}
