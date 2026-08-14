@@ -1,0 +1,33 @@
+name: Lint Python code
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Python
+        uses: actions/setup-python@v7
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install the dependencies
+        run: uv sync
+
+      - name: Run Pylint
+        run: uv run -m pylint uc_intg_awol_valerion
+
+      - name: Run flake8
+        run: uv run -m flake8 uc_intg_awol_valerion --count --show-source --statistics
+
+      - name: Check import sorting
+        run: uv run -m isort uc_intg_awol_valerion/. --check --verbose
+
+      - name: Check code format
+        run: uv format --check
