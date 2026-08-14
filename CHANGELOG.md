@@ -1,4 +1,13 @@
-# Integration Template Changelog
+# Changelog
+
+## 0.1.0 (2026-08-14)
+
+
+### Miscellaneous
+
+* Initial commit ([77d1241](https://github.com/tinogo/uc-intg-awol-valerion/commit/77d1241626525e270963fca731b94c7090f2cab2))
+
+## Integration Template Changelog
 
 All notable changes to this project will be documented in this file.
 
