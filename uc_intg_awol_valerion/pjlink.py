@@ -1,0 +1,293 @@
+"""Async PJLink (Class 1/2) client for Epson projectors.
+
+One short-lived TCP connection per command (the PJLink reference behaviour),
+serialised through a lock. Handles the optional MD5 authentication handshake
+and parses the Epson responses verified on a real QB1000.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import hashlib
+import logging
+from dataclasses import dataclass, field
+
+from uc_intg_awol_valerion import const
+from uc_intg_awol_valerion.transport import (
+    ProjectorIdentity,
+    ProjectorStatus,
+    Transport,
+    TransportAuthError,
+)
+
+_LOG = logging.getLogger(__name__)
+
+_TIMEOUT = 4.0
+
+
+class PJLinkError(Exception):
+    """Raised for PJLink protocol-level failures (auth, ERR responses)."""
+
+
+class PJLinkAuthError(PJLinkError):
+    """Raised when the projector rejects the supplied PJLink password."""
+
+
+@dataclass
+class PJLinkStatus:
+    """A polled snapshot of the projector's dynamic state."""
+
+    power: str = const.AwolValerionStates.UNAVAILABLE
+    reachable: bool = False
+    input_code: str | None = None
+    av_muted: bool = False
+    errors: dict[str, str] = field(default_factory=dict)
+    has_error: bool = False
+
+
+@dataclass
+class PJLinkIdentity:
+    """Static device information (queried once)."""
+
+    name: str = ""
+    manufacturer: str = ""
+    product: str = ""
+    other_info: str = ""
+    sw_version: str = ""
+    rec_resolution: str = ""
+    input_codes: list[str] = field(default_factory=list)
+
+
+class PJLinkClient:
+    """Talks PJLink to a single projector."""
+
+    def __init__(self, host: str, port: int, password: str = "") -> None:
+        self._host = host
+        self._port = port
+        self._password = password or ""
+        self._lock = asyncio.Lock()
+
+    @property
+    def host(self) -> str:
+        return self._host
+
+    async def _send(self, command: str) -> str:
+        """Open a connection, (optionally) authenticate, send one command, read reply."""
+        async with self._lock:
+            reader, writer = await asyncio.wait_for(
+                asyncio.open_connection(self._host, self._port), timeout=_TIMEOUT
+            )
+            try:
+                greeting = (
+                    (await asyncio.wait_for(reader.read(64), timeout=_TIMEOUT))
+                    .decode("utf-8", errors="replace")
+                    .strip()
+                )
+                payload = command
+                if greeting.startswith("PJLINK 1"):
+                    parts = greeting.split(" ")
+                    if len(parts) < 3:
+                        raise PJLinkError("Malformed authentication challenge")
+                    seed = parts[2].strip()
+                    digest = hashlib.md5(
+                        (self._password + seed).encode("utf-8")
+                    ).hexdigest()
+                    payload = f"{digest}{command}"
+                elif greeting.startswith("PJLINK ERRA"):
+                    raise PJLinkAuthError("Authentication required")
+
+                writer.write(f"{payload}\r".encode("utf-8"))
+                await writer.drain()
+                raw = await asyncio.wait_for(reader.read(256), timeout=_TIMEOUT)
+                response = raw.decode("utf-8", errors="replace").strip()
+                if "PJLINK ERRA" in response:
+                    raise PJLinkAuthError("Invalid PJLink password")
+                return response
+            finally:
+                writer.close()
+                try:
+                    await writer.wait_closed()
+                except Exception:  # pylint: disable=broad-exception-caught
+                    pass
+
+    @staticmethod
+    def _value(response: str) -> str | None:
+        """Extract the value from an ``%<cmd>=<value>`` reply."""
+        if "=" not in response:
+            return None
+        return response.split("=", 1)[1].strip()
+
+    @staticmethod
+    def _is_err(value: str | None) -> bool:
+        return value is None or value.upper().startswith("ERR")
+
+    # -- high-level queries -------------------------------------------------
+    async def test(self) -> bool:
+        """Return True if the projector answers a power query (validates setup)."""
+        value = self._value(await self._send(const.AwolValerionCommands.GET_POWER))
+        return value is not None
+
+    async def get_power(self) -> str:
+        value = self._value(await self._send(const.AwolValerionCommands.GET_POWER))
+        if self._is_err(value):
+            return const.AwolValerionStates.UNAVAILABLE
+        return const.PJLINK_POWER.get(value, const.AwolValerionStates.UNAVAILABLE)
+
+    async def get_input(self) -> str | None:
+        value = self._value(await self._send(const.AwolValerionCommands.GET_INPUT))
+        return None if self._is_err(value) else value
+
+    async def get_av_mute(self) -> bool:
+        value = self._value(await self._send(const.AwolValerionCommands.GET_AVMUTE))
+        if self._is_err(value):
+            return False
+        return value in const.AVMUTE_MUTED
+
+    async def get_errors(self) -> tuple[dict[str, str], bool]:
+        value = self._value(await self._send(const.AwolValerionCommands.GET_ERRORS))
+        if self._is_err(value) or len(value) < 6:
+            return {}, False
+        result: dict[str, str] = {}
+        has_error = False
+        for name, char in zip(const.ERST_COMPONENTS, value[:6]):
+            level = const.ERST_LEVELS.get(char, "OK")
+            result[name] = level
+            if char == "2":
+                has_error = True
+        return result, has_error
+
+    async def poll(self) -> PJLinkStatus:
+        """Fetch a full dynamic snapshot; sets ``reachable`` on TCP success."""
+        status = PJLinkStatus()
+        try:
+            status.power = await self.get_power()
+            status.reachable = status.power != const.AwolValerionStates.UNAVAILABLE
+        except PJLinkAuthError:
+            raise
+        except (OSError, asyncio.TimeoutError, PJLinkError) as err:
+            _LOG.debug("[%s] PJLink unreachable: %s", self._host, err)
+            return status
+
+        if status.power in (
+            const.AwolValerionStates.ON,
+            const.AwolValerionStates.UNKNOWN,
+        ):
+            try:
+                status.input_code = await self.get_input()
+                status.av_muted = await self.get_av_mute()
+            except (OSError, asyncio.TimeoutError, PJLinkError):
+                pass
+        try:
+            status.errors, status.has_error = await self.get_errors()
+        except (OSError, asyncio.TimeoutError, PJLinkError):
+            pass
+        return status
+
+    async def get_identity(self) -> PJLinkIdentity:
+        """Query the static device information (name, model, serial, inputs...)."""
+        identity = PJLinkIdentity()
+
+        async def _q(command: str) -> str:
+            value = self._value(await self._send(command))
+            return "" if self._is_err(value) else value
+
+        identity.name = await _q(const.AwolValerionCommands.GET_NAME)
+        identity.manufacturer = await _q(const.AwolValerionCommands.GET_MANUFACTURER)
+        identity.product = await _q(const.AwolValerionCommands.GET_PRODUCT)
+        identity.other_info = await _q(const.AwolValerionCommands.GET_OTHER_INFO)
+        identity.sw_version = await _q(const.AwolValerionCommands.GET_SW_VERSION)
+        identity.rec_resolution = await _q(const.AwolValerionCommands.GET_REC_RESOLUTION)
+        inst = await _q(const.AwolValerionCommands.GET_INPUT_LIST)
+        identity.input_codes = inst.split() if inst else []
+        return identity
+
+    # -- commands -----------------------------------------------------------
+    async def power_on(self) -> None:
+        await self._send(const.AwolValerionCommands.POWER_ON)
+
+    async def power_off(self) -> None:
+        await self._send(const.AwolValerionCommands.POWER_OFF)
+
+    async def select_input(self, code: str) -> None:
+        await self._send(const.AwolValerionCommands.SET_INPUT.format(code=code))
+
+    async def set_av_mute(self, muted: bool) -> None:
+        await self._send(const.AwolValerionCommands.SET_AVMUTE_ON if muted else const.AwolValerionCommands.SET_AVMUTE_OFF)
+
+    async def send_raw(self, command: str) -> str:
+        """Send a raw PJLink command string (e.g. ``%1INPT 32``)."""
+        return await self._send(command)
+
+
+class PJLinkTransport(Transport):
+    """Transport adapter around :class:`PJLinkClient`."""
+
+    name = "pjlink"
+    supports_color_mode = False
+
+    def __init__(self, host: str, port: int, password: str = "") -> None:
+        self._client = PJLinkClient(host, port, password)
+
+    async def probe(self) -> bool:
+        try:
+            return await self._client.test()
+        except PJLinkAuthError as err:
+            raise TransportAuthError(str(err)) from err
+        except Exception:  # pylint: disable=broad-exception-caught
+            return False
+
+    async def get_identity(self) -> ProjectorIdentity:
+        try:
+            ident = await self._client.get_identity()
+        except PJLinkAuthError as err:
+            raise TransportAuthError(str(err)) from err
+        return ProjectorIdentity(
+            name=ident.name,
+            manufacturer=ident.manufacturer,
+            product=ident.product,
+            sw_version=ident.sw_version,
+            rec_resolution=ident.rec_resolution,
+            source_names=[
+                const.PJLINK_INPUT_NAMES.get(c, f"Input {c}") for c in ident.input_codes
+            ],
+        )
+
+    async def poll(self) -> ProjectorStatus:
+        try:
+            st = await self._client.poll()
+        except PJLinkAuthError as err:
+            raise TransportAuthError(str(err)) from err
+        source = ""
+        if st.input_code:
+            source = const.PJLINK_INPUT_NAMES.get(
+                st.input_code, f"Input {st.input_code}"
+            )
+        return ProjectorStatus(
+            power=st.power,
+            reachable=st.reachable,
+            source=source,
+            av_muted=st.av_muted,
+            errors=st.errors,
+            has_error=st.has_error,
+        )
+
+    async def power_on(self) -> None:
+        await self._client.power_on()
+
+    async def power_off(self) -> None:
+        await self._client.power_off()
+
+    async def select_source(self, name: str) -> bool:
+        code = const.PJLINK_INPUT_NAMES_INV.get(name)
+        if code is None and name in const.PJLINK_INPUT_NAMES:
+            code = name
+        if code is None:
+            return False
+        await self._client.select_input(code)
+        return True
+
+    async def set_av_mute(self, muted: bool) -> None:
+        await self._client.set_av_mute(muted)
+
+    async def send_raw(self, command: str) -> str:
+        return await self._client.send_raw(command)
