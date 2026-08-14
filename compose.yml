@@ -1,0 +1,43 @@
+# Docker Compose for development with the UC Core Simulator
+name: integration-awol-valerion
+
+services:
+  # Unfolded Circle Core Simulator for testing
+  core-simulator:
+    image: unfoldedcircle/core-simulator:latest
+    restart: "unless-stopped"
+    hostname: core-simulator
+    environment:
+      - UC_INTEGRATION_DISABLE_CERT_VERIFICATION=true
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - simulator-data:/data
+    depends_on:
+      - uc-intg-awol-valerion
+
+  # Your integration service
+  uc-intg-awol-valerion:
+     build:
+       dockerfile: ./Dockerfile
+     hostname: uc-intg-awol-valerion
+     command: bash -c "UC_INTEGRATION_INTERFACE=$(hostname -i) python3 -m uc_intg_awol_valerion"
+     volumes:
+       - integration-data:/config
+     develop:
+       watch:
+         - path: ./requirements.txt
+           action: rebuild
+
+         - path: uc_intg_awol_valerion
+           target: /app/uc_intg_awol_valerion
+           action: sync+restart
+
+         - path: ./driver.json
+           target: /app/driver.json
+           action: sync+restart
+
+volumes:
+  simulator-data:
+  integration-data:
