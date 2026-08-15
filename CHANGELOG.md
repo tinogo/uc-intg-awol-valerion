@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.2.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.1.0...v0.2.0) (2026-08-15)
+
+
+### Features
+
+* **#9:** add a remote entity ([76a610b](https://github.com/tinogo/uc-intg-awol-valerion/commit/76a610bab3dd761af00239fc6bc3d917eed9738c))
+* add simple commands ([710e454](https://github.com/tinogo/uc-intg-awol-valerion/commit/710e4544e4782c1d3fa0ad69ec44dc3776ebb861))
+
+
+### Bug Fixes
+
+* fix muting/unmuting ([83b57fd](https://github.com/tinogo/uc-intg-awol-valerion/commit/83b57fd0c9cd3a79f5a771c74fc5310cb9a6e0d7))
+
+
+### Documentation
+
+* **#9:** mention the remote entity in the readme ([f8abd04](https://github.com/tinogo/uc-intg-awol-valerion/commit/f8abd04d130aa4c4539c2344e68c26e8c963bc8e))
+* fix a typo ([e8ae633](https://github.com/tinogo/uc-intg-awol-valerion/commit/e8ae633a0c55900ce7f44b33e1aa64fdfb1d5495))
+
 ## 0.1.0 (2026-08-15)
 
 
