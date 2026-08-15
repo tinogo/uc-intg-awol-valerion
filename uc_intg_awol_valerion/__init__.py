@@ -21,7 +21,7 @@ from uc_intg_awol_valerion.setup import AwolValerionSetupFlow
 
 
 async def main():
-    """Start the Remote Two integration driver."""
+    """Start the Remote Two/3 integration driver."""
     logging.basicConfig()
 
     # Configure logging level from environment variable

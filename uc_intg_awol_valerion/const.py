@@ -30,31 +30,6 @@ class AwolValerionStates(StrEnum):
     ON = "ON"
 
 
-# PJLink power reply codes (from ``%1POWR ?`` / ``%1POWR=<n>``)
-# PJLink power reply codes (from ``%1POWR ?`` / ``%1POWR=<n>``)
-PJLINK_POWER = {
-    "0": AwolValerionStates.OFF,  # standby
-    "1": AwolValerionStates.ON,  # lamp on
-}
-
-# PJLink AV-mute reply codes (``%1AVMT=<n>``): 30 off, 11/21/31 muted
-AVMUTE_MUTED = {"11", "21", "31"}
-
-# PJLink error-status positions for ``%1ERST=<6 chars>``
-ERST_COMPONENTS = ("Fan", "Lamp", "Temperature", "Cover", "Filter", "Other")
-ERST_LEVELS = {"0": "OK", "1": "Warning", "2": "Error"}
-
-# PJLink input-code -> friendly name. INST reports which exist per device;
-# type digit: 1=RGB 2=Video 3=Digital 4=Storage 5=Network.
-PJLINK_INPUT_NAMES = {
-    "30": "Home",
-    "31": "HDMI 1",
-    "32": "HDMI 2",
-    "33": "HDMI 3",
-}
-PJLINK_INPUT_NAMES_INV = {v: k for k, v in PJLINK_INPUT_NAMES.items()}
-
-
 class AwolValerionCommands(StrEnum):
     """Defines the possible commands of the AWOL Valerion projector."""
 
@@ -67,7 +42,6 @@ class AwolValerionCommands(StrEnum):
     GET_AVMUTE = "%1AVMT ?"
     SET_AVMUTE_ON = "%1AVMT 31"
     SET_AVMUTE_OFF = "%1AVMT 30"
-    GET_ERRORS = "%1ERST ?"
     GET_NAME = "%1NAME ?"
     GET_MANUFACTURER = "%1INF1 ?"
     GET_PRODUCT = "%1INF2 ?"

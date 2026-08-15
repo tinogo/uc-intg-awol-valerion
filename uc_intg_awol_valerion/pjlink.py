@@ -14,15 +14,36 @@ from dataclasses import dataclass, field
 
 from uc_intg_awol_valerion import Loggers
 from uc_intg_awol_valerion.const import (
-    AVMUTE_MUTED,
-    ERST_COMPONENTS,
-    ERST_LEVELS,
-    PJLINK_POWER,
     AwolValerionCommands,
     AwolValerionStates,
 )
 
 _LOG = logging.getLogger(Loggers.PJLINK)
+
+# PJLink power reply codes (from ``%1POWR ?`` / ``%1POWR=<n>``)
+# PJLink power reply codes (from ``%1POWR ?`` / ``%1POWR=<n>``)
+PJLINK_POWER = {
+    "0": AwolValerionStates.OFF, # standby
+    "1": AwolValerionStates.ON,  # on
+    "2": AwolValerionStates.OFF, # off
+}
+
+# PJLink AV-mute reply codes (``%1AVMT=<n>``): 30 off, 11/21/31 muted
+AVMUTE_MUTED = {"11", "21", "31"}
+
+# PJLink error-status positions for ``%1ERST=<6 chars>``
+ERST_COMPONENTS = ("Fan", "Lamp", "Temperature", "Cover", "Filter", "Other")
+ERST_LEVELS = {"0": "OK", "1": "Warning", "2": "Error"}
+
+# PJLink input-code -> friendly name. INST reports which exist per device;
+# type digit: 1=RGB 2=Video 3=Digital 4=Storage 5=Network.
+PJLINK_INPUT_NAMES = {
+    "30": "Home",
+    "31": "HDMI 1",
+    "32": "HDMI 2",
+    "33": "HDMI 3",
+}
+PJLINK_INPUT_NAMES_INV = {v: k for k, v in PJLINK_INPUT_NAMES.items()}
 
 _TIMEOUT = 4.0
 
@@ -100,10 +121,15 @@ class PJLinkClient:
                 elif greeting.startswith("PJLINK ERRA"):
                     raise PJLinkAuthError("Authentication required")
 
+                _LOG.debug("[%s] Sending: %s", self._host, payload)
+
                 writer.write(f"{payload}\r".encode("utf-8"))
                 await writer.drain()
                 raw = await asyncio.wait_for(reader.read(256), timeout=_TIMEOUT)
                 response = raw.decode("utf-8", errors="replace").strip()
+
+                _LOG.debug("[%s] Received: %s", self._host, response)
+
                 if "PJLINK ERRA" in response:
                     raise PJLinkAuthError("Invalid PJLink password")
                 return response
@@ -150,20 +176,6 @@ class PJLinkClient:
             return False
         return value in AVMUTE_MUTED
 
-    async def get_errors(self) -> tuple[dict[str, str], bool]:
-        """Return a dict of component errors and a bool indicating if there are any."""
-        value = self._value(await self._send(AwolValerionCommands.GET_ERRORS))
-        if self._is_err(value) or len(value) < 6:
-            return {}, False
-        result: dict[str, str] = {}
-        has_error = False
-        for name, char in zip(ERST_COMPONENTS, value[:6]):
-            level = ERST_LEVELS.get(char, "OK")
-            result[name] = level
-            if char == "2":
-                has_error = True
-        return result, has_error
-
     async def poll(self) -> PJLinkStatus:
         """Fetch a full dynamic snapshot; sets ``reachable`` on TCP success."""
         status = PJLinkStatus()
@@ -185,10 +197,6 @@ class PJLinkClient:
                 status.av_muted = await self.get_av_mute()
             except (OSError, asyncio.TimeoutError, PJLinkError):
                 pass
-        try:
-            status.errors, status.has_error = await self.get_errors()
-        except (OSError, asyncio.TimeoutError, PJLinkError):
-            pass
         return status
 
     async def get_identity(self) -> PJLinkIdentity:
