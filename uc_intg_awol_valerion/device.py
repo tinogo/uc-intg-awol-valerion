@@ -225,15 +225,23 @@ class AwolValerionDevice(PollingDevice):
         return await self.send_raw(const.AwolValerionCommands.RETURN)
 
     async def home(self) -> bool:
-        """Presses the HOME key in the projector's OSD."""
+        """Show the home screen of the projector."""
         return await self.send_raw(const.AwolValerionCommands.HOME)
 
+    async def menu(self) -> bool:
+        """Show the menu of the projector."""
+        return await self.send_raw(const.AwolValerionCommands.MENU)
+
+    async def settings(self) -> bool:
+        """Show the settings of the projector."""
+        return await self.send_raw(const.AwolValerionCommands.SETTINGS)
+
     async def volume_up(self) -> bool:
-        """Increases the projector's volume."""
+        """Increase the projector's volume."""
         return await self.send_raw(const.AwolValerionCommands.VOLUME_UP)
 
     async def volume_down(self) -> bool:
-        """Decreases the projector's volume."""
+        """Decrease the projector's volume."""
         return await self.send_raw(const.AwolValerionCommands.VOLUME_DOWN)
 
     async def volume_x(self, volume) -> bool:

@@ -21,6 +21,29 @@ class Loggers(StrEnum):
     SETUP_FLOW = "setup_flow"
 
 
+class SimpleCommands(StrEnum):
+    """
+    Additional simple commands not covered by standard media-player features.
+
+    Simple commands appear in the UI as buttons the user can press.
+    """
+
+    VOLUME_UP = "VOLUME_UP"
+    VOLUME_DOWN = "VOLUME_DOWN"
+    MUTE_ON = "MUTE_ON"
+    MUTE_OFF = "MUTE_OFF"
+    MUTE_TOGGLE = "MUTE_TOGGLE"
+    CURSOR_UP = "CURSOR_UP"
+    CURSOR_DOWN = "CURSOR_DOWN"
+    CURSOR_LEFT = "CURSOR_LEFT"
+    CURSOR_RIGHT = "CURSOR_RIGHT"
+    CURSOR_ENTER = "CURSOR_ENTER"
+    BACK = "BACK"
+    MENU = "MENU"
+    SETTINGS = "SETTINGS"
+    HOME = "HOME"
+
+
 class AwolValerionStates(StrEnum):
     """Defines the possible states of the AWOL Valerion projector."""
 

@@ -19,8 +19,10 @@ from uc_intg_awol_valerion.const import (
     MEDIA_PLAYER_STATE_MAPPING,
     AwolValerionStates,
     Loggers,
+    SimpleCommands,
 )
 from uc_intg_awol_valerion.device import AwolValerionDevice
+from uc_intg_awol_valerion.simple_commands import get_simple_command_map
 
 _LOG = logging.getLogger(Loggers.MEDIA_PLAYER)
 
@@ -70,6 +72,7 @@ class AwolValerionMediaPlayer(MediaPlayer, Entity):
             media_player.Commands.CURSOR_ENTER.value: device.cursor_enter,
             media_player.Commands.BACK.value: device.back,
             media_player.Commands.HOME.value: device.home,
+            **get_simple_command_map(self._device),
         }
 
         entity_id = create_entity_id(EntityTypes.MEDIA_PLAYER, device.identifier)
@@ -82,7 +85,11 @@ class AwolValerionMediaPlayer(MediaPlayer, Entity):
             features=FEATURES,
             attributes=device.get_device_attributes(entity_id),
             device_class=DeviceClasses.TV,
-            options={},
+            options={
+                media_player.Options.SIMPLE_COMMANDS: [
+                    member.value for member in SimpleCommands
+                ]
+            },
             cmd_handler=self.handle_command,
         )
 
