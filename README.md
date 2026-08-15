@@ -4,7 +4,7 @@ This repository contains the source code for the [Unfolded Circle Remote Two/3](
 
 The integration is based on the amazing work of JackJPowell's [ucapi-framework](https://github.com/jackjpowell/ucapi-framework).
 
-It also heavily boroughs code from the [Epson projector integration](https://github.com/mase1981/uc-intg-epson) by @mase1981 - thank you for all the great integrations! :)
+It also heavily borrows code from the [Epson projector integration](https://github.com/mase1981/uc-intg-epson) by @mase1981 - thank you for all the great integrations! :)
 
 ## Table of contents
 
