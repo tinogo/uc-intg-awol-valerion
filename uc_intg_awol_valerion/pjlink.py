@@ -31,20 +31,6 @@ PJLINK_POWER = {
 # PJLink AV-mute reply codes (``%1AVMT=<n>``): 30 off, 11/21/31 muted
 AVMUTE_MUTED = {"11", "21", "31"}
 
-# PJLink error-status positions for ``%1ERST=<6 chars>``
-ERST_COMPONENTS = ("Fan", "Lamp", "Temperature", "Cover", "Filter", "Other")
-ERST_LEVELS = {"0": "OK", "1": "Warning", "2": "Error"}
-
-# PJLink input-code -> friendly name. INST reports which exist per device;
-# type digit: 1=RGB 2=Video 3=Digital 4=Storage 5=Network.
-PJLINK_INPUT_NAMES = {
-    "30": "Home",
-    "31": "HDMI 1",
-    "32": "HDMI 2",
-    "33": "HDMI 3",
-}
-PJLINK_INPUT_NAMES_INV = {v: k for k, v in PJLINK_INPUT_NAMES.items()}
-
 _TIMEOUT = 4.0
 
 
@@ -63,9 +49,32 @@ class PJLinkStatus:
     power: AwolValerionStates = AwolValerionStates.UNAVAILABLE
     reachable: bool = False
     input_code: str | None = None
+    input_list: dict[str, str] = field(default_factory=lambda: {
+        "Home": "30",
+        "HDMI 1": "31",
+        "HDMI 2": "32",
+        "HDMI 3": "33",
+    })
     av_muted: bool = False
-    errors: dict[str, str] = field(default_factory=dict)
-    has_error: bool = False
+    volume: int = 0
+
+    @property
+    def source_list(self) -> list[str]:
+        """Return a list of the available input sources."""
+        return list(self.input_list.keys())
+
+    @property
+    def input(self) -> str | None:
+        """Return the current source."""
+        if self.input_code is None:
+            return None
+
+        try:
+            return list(self.input_list.keys())[
+                list(self.input_list.values()).index(self.input_code)
+            ]
+        except ValueError:
+            return None
 
 
 @dataclass
@@ -78,7 +87,6 @@ class PJLinkIdentity:
     other_info: str = ""
     sw_version: str = ""
     rec_resolution: str = ""
-    input_codes: list[str] = field(default_factory=list)
 
 
 class PJLinkClient:
@@ -176,6 +184,13 @@ class PJLinkClient:
             return False
         return value in AVMUTE_MUTED
 
+    async def get_volume(self) -> int:
+        """Return the current volume of the projector."""
+        value = self._value(await self._send(AwolValerionCommands.GET_VOLUME))
+        if self._is_err(value) or value is None:
+            return 0
+        return int(value)
+
     async def poll(self) -> PJLinkStatus:
         """Fetch a full dynamic snapshot; sets ``reachable`` on TCP success."""
         status = PJLinkStatus()
@@ -195,6 +210,7 @@ class PJLinkClient:
             try:
                 status.input_code = await self.get_input()
                 status.av_muted = await self.get_av_mute()
+                status.volume = await self.get_volume()
             except (OSError, asyncio.TimeoutError, PJLinkError):
                 pass
         return status
@@ -213,8 +229,7 @@ class PJLinkClient:
         identity.other_info = await _q(AwolValerionCommands.GET_OTHER_INFO)
         identity.sw_version = await _q(AwolValerionCommands.GET_SW_VERSION)
         identity.rec_resolution = await _q(AwolValerionCommands.GET_REC_RESOLUTION)
-        inst = await _q(AwolValerionCommands.GET_INPUT_LIST)
-        identity.input_codes = inst.split() if inst else []
+
         return identity
 
     # -- commands -----------------------------------------------------------

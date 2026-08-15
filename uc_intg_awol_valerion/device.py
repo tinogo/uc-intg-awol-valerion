@@ -50,8 +50,8 @@ class AwolValerionDevice(PollingDevice):
             self.device_config.port,
             self.device_config.password,
         )
-        self._status = PJLinkStatus()
-        self._identity = PJLinkIdentity()
+        self.status = PJLinkStatus()
+        self.identity = PJLinkIdentity()
         self._color_mode: str | None = None
         self._identity_loaded = False
         self._fail_count = 0
@@ -79,14 +79,14 @@ class AwolValerionDevice(PollingDevice):
     @property
     def state(self) -> AwolValerionStates:
         """Return the current device state."""
-        if not self._status.reachable:
+        if not self.status.reachable:
             return const.AwolValerionStates.UNAVAILABLE
-        return self._status.power
+        return self.status.power
 
     @property
     def power(self) -> bool:
         """Return the current power state."""
-        return self._status.power in (const.AwolValerionStates.ON,)
+        return self.status.power in (const.AwolValerionStates.ON,)
 
     async def establish_connection(self) -> Any:
         """Establish the initial connection to the projector."""
@@ -106,7 +106,7 @@ class AwolValerionDevice(PollingDevice):
 
     async def _load_identity(self) -> None:
         try:
-            self._identity = await self._client.get_identity()
+            self.identity = await self._client.get_identity()
             self._identity_loaded = True
         except PJLinkAuthError:
             _LOG.error("[%s] Authentication failed!", self.log_id)
@@ -126,45 +126,54 @@ class AwolValerionDevice(PollingDevice):
         if new_status.reachable:
             # A single command in the poll may transiently fail to read; keep the
             # last good value rather than flashing "N/A".
-            self._status = new_status
+            self.status = new_status
             self._fail_count = 0
         else:
             # Tolerate transient drops: keep the last-known state for a few
             # cycles before declaring the projector UNAVAILABLE.
             self._fail_count += 1
             if self._fail_count >= self.FAIL_THRESHOLD:
-                self._status = new_status
+                self.status = new_status
 
     async def power_on(self) -> bool:
         """Power on the projector."""
-        ok = False
+        if await self._client.get_power() is AwolValerionStates.ON:
+            return True
+
         try:
             await self._client.power_on()
-            ok = True
+            return True
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.info("[%s] power-on failed: %s", self.log_id, err)
-        return ok
+        return False
 
     async def power_off(self) -> bool:
         """Power off the projector."""
-        ok = False
+        if await self._client.get_power() is AwolValerionStates.OFF:
+            return True
+
         try:
             await self._client.power_off()
-            ok = True
+            return True
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.info("[%s] power-off failed: %s", self.log_id, err)
-        return ok
+        return False
 
     async def power_toggle(self) -> bool:
         """Toggle the power of the projector."""
         return await self.power_off() if self.power else await self.power_on()
 
     async def select_source(self, name: str) -> bool:
-        """Switche the projector to a different input."""
-        try:
-            if await self._client.select_input(name):
-                return True
+        """Switch the projector to a different input."""
+        source = self.status.input_list.get(name)
+
+        if source is None:
             _LOG.warning("[%s] Unknown source: %s", self.log_id, name)
+            return False
+
+        try:
+            if await self._client.select_input(source):
+                return True
             return False
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.error("[%s] Source select failed: %s", self.log_id, err)
@@ -189,7 +198,7 @@ class AwolValerionDevice(PollingDevice):
 
     async def av_mute_toggle(self) -> bool:
         """Toggle the projector's audio and video output mute state."""
-        return await self._set_av_mute(not self._status.av_muted)
+        return await self._set_av_mute(not self.status.av_muted)
 
     async def cursor_up(self) -> bool:
         """Move the cursor up in the projector's OSD."""

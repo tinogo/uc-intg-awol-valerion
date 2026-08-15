@@ -122,9 +122,9 @@ class AwolValerionMediaPlayer(MediaPlayer, Entity):
                     volume = params.get("volume") if params else None
                     await self._device.volume_x(volume)
 
-                # case media_player.Commands.SELECT_SOURCE:
-                #     source = params.get("source") if params else None
-                #     await self._device.select_source(source)
+                case media_player.Commands.SELECT_SOURCE:
+                    source = params.get("source") if params else None
+                    await self._device.select_source(source)
 
                 # --- unhandled commands ---
                 case _:
@@ -146,9 +146,9 @@ class AwolValerionMediaPlayer(MediaPlayer, Entity):
         self.update(
             {
                 MediaAttr.STATE: MEDIA_PLAYER_STATE_MAPPING[self._device.state],
-                # MediaAttr.SOURCE: self._device.device_attributes.source,
-                # MediaAttr.SOURCE_LIST: self._device.device_attributes.source_list,
-                # MediaAttr.VOLUME: self._device.device_attributes.volume,
-                # MediaAttr.MUTED: self._device.device_attributes.muted,
+                MediaAttr.SOURCE: self._device.status.input,
+                MediaAttr.SOURCE_LIST: list(self._device.status.source_list),
+                MediaAttr.VOLUME: self._device.status.volume,
+                MediaAttr.MUTED: self._device.status.av_muted,
             }
         )
