@@ -29,7 +29,7 @@ PJLINK_POWER = {
 }
 
 # PJLink AV-mute reply codes (``%1AVMT=<n>``): 30 off, 11/21/31 muted
-AVMUTE_MUTED = {"11", "21", "31"}
+AVMUTE_MUTED = {"21"}
 
 _TIMEOUT = 4.0
 
@@ -179,8 +179,8 @@ class PJLinkClient:
         value = self._value(await self._send(AwolValerionCommands.GET_INPUT))
         return None if self._is_err(value) else value
 
-    async def get_av_mute(self) -> bool:
-        """Return True if the projector's audio and video output is muted."""
+    async def get_mute(self) -> bool:
+        """Return True if the projector's audio output is muted."""
         value = self._value(await self._send(AwolValerionCommands.GET_AVMUTE))
         if self._is_err(value):
             return False
@@ -211,7 +211,7 @@ class PJLinkClient:
         ):
             try:
                 status.input_code = await self.get_input()
-                status.av_muted = await self.get_av_mute()
+                status.av_muted = await self.get_mute()
                 status.volume = await self.get_volume()
             except (OSError, asyncio.TimeoutError, PJLinkError):
                 pass
@@ -247,12 +247,12 @@ class PJLinkClient:
         """Select a different input."""
         await self._send(AwolValerionCommands.SET_INPUT.format(code=code))
 
-    async def set_av_mute(self, muted: bool) -> None:
-        """Mute/unmute the projector's audio and video output."""
+    async def set_mute(self, muted: bool) -> None:
+        """Mute/unmute the projector's audio output."""
         await self._send(
-            AwolValerionCommands.SET_AVMUTE_ON
+            AwolValerionCommands.SET_MUTE_ON
             if muted
-            else AwolValerionCommands.SET_AVMUTE_OFF
+            else AwolValerionCommands.SET_MUTE_OFF
         )
 
     async def send_raw(self, command: str) -> str:

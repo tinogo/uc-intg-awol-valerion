@@ -190,7 +190,7 @@ class AwolValerionDevice(PollingDevice):
     async def _set_av_mute(self, muted: bool) -> bool:
         """Set the AV mute state."""
         try:
-            await self._client.set_av_mute(muted)
+            await self._client.set_mute(muted)
             return True
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.error("[%s] AV-mute failed: %s", self.log_id, err)
