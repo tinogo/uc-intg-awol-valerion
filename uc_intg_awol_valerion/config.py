@@ -6,7 +6,7 @@ This module contains the configuration dataclass
 :license: Mozilla Public License Version 2.0, see LICENSE for more details.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass

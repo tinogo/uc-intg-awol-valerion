@@ -86,6 +86,7 @@ class AwolValerionCommands(StrEnum):
     HOME = "%3RCNC 8"
     VOLUME_DOWN = "%2SVOL 0"
     VOLUME_UP = "%2SVOL 1"
+    VOLUME_X_FORMAT = "%3VOLM {}"
 
 
 MEDIA_PLAYER_STATE_MAPPING = {

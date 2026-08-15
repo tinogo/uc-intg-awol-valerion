@@ -29,6 +29,9 @@ from uc_intg_awol_valerion.pjlink import (
 
 _LOG = logging.getLogger(Loggers.DEVICE)
 
+MIN_VOLUME = 0
+MAX_VOLUME = 100
+
 
 class AwolValerionDevice(PollingDevice):
     """AWOL Valerion Projector Device."""
@@ -82,6 +85,7 @@ class AwolValerionDevice(PollingDevice):
 
     @property
     def power(self) -> bool:
+        """Return the current power state."""
         return self._status.power in (const.AwolValerionStates.ON,)
 
     async def establish_connection(self) -> Any:
@@ -93,6 +97,7 @@ class AwolValerionDevice(PollingDevice):
         _LOG.info("[%s] Connection established (state=%s)", self.log_id, self.state)
 
     async def poll_device(self) -> None:
+        """Poll the device for the current device state."""
         async with self._connect_lock:
             if not self._identity_loaded:
                 await self._load_identity()
@@ -131,7 +136,7 @@ class AwolValerionDevice(PollingDevice):
                 self._status = new_status
 
     async def power_on(self) -> bool:
-        """Powers on the projector."""
+        """Power on the projector."""
         ok = False
         try:
             await self._client.power_on()
@@ -141,6 +146,7 @@ class AwolValerionDevice(PollingDevice):
         return ok
 
     async def power_off(self) -> bool:
+        """Power off the projector."""
         ok = False
         try:
             await self._client.power_off()
@@ -150,9 +156,11 @@ class AwolValerionDevice(PollingDevice):
         return ok
 
     async def power_toggle(self) -> bool:
+        """Toggle the power of the projector."""
         return await self.power_off() if self.power else await self.power_on()
 
     async def select_source(self, name: str) -> bool:
+        """Switche the projector to a different input."""
         try:
             if await self._client.select_input(name):
                 return True
@@ -163,12 +171,15 @@ class AwolValerionDevice(PollingDevice):
             return False
 
     async def av_mute_on(self) -> bool:
+        """Mute the projector's audio and video output."""
         return await self._set_av_mute(True)
 
     async def av_mute_off(self) -> bool:
+        """Unmute the projector's audio and video output."""
         return await self._set_av_mute(False)
 
     async def _set_av_mute(self, muted: bool) -> bool:
+        """Set the AV mute state."""
         try:
             await self._client.set_av_mute(muted)
             return True
@@ -177,36 +188,55 @@ class AwolValerionDevice(PollingDevice):
             return False
 
     async def av_mute_toggle(self) -> bool:
+        """Toggle the projector's audio and video output mute state."""
         return await self._set_av_mute(not self._status.av_muted)
 
     async def cursor_up(self) -> bool:
+        """Move the cursor up in the projector's OSD."""
         return await self.send_raw(const.AwolValerionCommands.CURSOR_UP)
 
     async def cursor_down(self) -> bool:
+        """Move the cursor down in the projector's OSD."""
         return await self.send_raw(const.AwolValerionCommands.CURSOR_DOWN)
 
     async def cursor_left(self) -> bool:
+        """Move the cursor left in the projector's OSD."""
         return await self.send_raw(const.AwolValerionCommands.CURSOR_LEFT)
 
     async def cursor_right(self) -> bool:
+        """Move the cursor right in the projector's OSD."""
         return await self.send_raw(const.AwolValerionCommands.CURSOR_RIGHT)
 
     async def cursor_enter(self) -> bool:
+        """Presses the OK key in the projector's OSD."""
         return await self.send_raw(const.AwolValerionCommands.CURSOR_OK)
 
     async def back(self) -> bool:
+        """Presses the BACK key in the projector's OSD."""
         return await self.send_raw(const.AwolValerionCommands.RETURN)
 
     async def home(self) -> bool:
+        """Presses the HOME key in the projector's OSD."""
         return await self.send_raw(const.AwolValerionCommands.HOME)
 
     async def volume_up(self) -> bool:
+        """Increases the projector's volume."""
         return await self.send_raw(const.AwolValerionCommands.VOLUME_UP)
 
     async def volume_down(self) -> bool:
+        """Decreases the projector's volume."""
         return await self.send_raw(const.AwolValerionCommands.VOLUME_DOWN)
 
+    async def volume_x(self, volume) -> bool:
+        """Set the projector's volume to a specific level."""
+        sanitized_volume = max(MIN_VOLUME, min(MAX_VOLUME, int(volume)))
+
+        return await self.send_raw(
+            const.AwolValerionCommands.VOLUME_X_FORMAT.format(sanitized_volume)
+        )
+
     async def send_raw(self, command: str) -> bool:
+        """Send a raw PJLink command string (e.g. ``%1INPT 32``)."""
         try:
             await self._client.send_raw(command)
             return True

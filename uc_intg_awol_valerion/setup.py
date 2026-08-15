@@ -15,7 +15,7 @@ from ucapi_framework import BaseSetupFlow
 
 from uc_intg_awol_valerion.config import AwolValerionConfig
 from uc_intg_awol_valerion.const import Loggers
-from uc_intg_awol_valerion.pjlink import PJLinkClient, PJLinkIdentity, PJLinkAuthError
+from uc_intg_awol_valerion.pjlink import PJLinkAuthError, PJLinkClient, PJLinkIdentity
 
 _LOG = logging.getLogger(Loggers.SETUP_FLOW)
 
@@ -129,9 +129,12 @@ class AwolValerionSetupFlow(BaseSetupFlow[AwolValerionConfig]):
 
             identity = await self._probe(config)
             if identity is not None:
-                _LOG.info("Detected %s on address %s",identity.product, address)
+                _LOG.info("Detected %s on address %s", identity.product, address)
             else:
-                _LOG.info("Projector %s not reachable now; will connect when available", address)
+                _LOG.info(
+                    "Projector %s not reachable now; will connect when available",
+                    address,
+                )
 
             return config
 
@@ -156,6 +159,6 @@ class AwolValerionSetupFlow(BaseSetupFlow[AwolValerionConfig]):
                 identity = await client.get_identity()
                 return identity
         except PJLinkAuthError:
-            _LOG.warning("%s needs a password; completing anyway",config.address)
+            _LOG.warning("%s needs a password; completing anyway", config.address)
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.debug("Probe failed for %s: %s", config.address, err)

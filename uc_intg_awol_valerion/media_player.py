@@ -117,11 +117,11 @@ class AwolValerionMediaPlayer(MediaPlayer, Entity):
                 case cmd_id if cmd_id in self._command_map:
                     await self._command_map[cmd_id]()
 
-                # # complex commands (with parameters)
-                # case media_player.Commands.VOLUME:
-                #     volume = params.get("volume") if params else None
-                #     await self._device.volume_x(volume)
-                #
+                # complex commands (with parameters)
+                case media_player.Commands.VOLUME:
+                    volume = params.get("volume") if params else None
+                    await self._device.volume_x(volume)
+
                 # case media_player.Commands.SELECT_SOURCE:
                 #     source = params.get("source") if params else None
                 #     await self._device.select_source(source)

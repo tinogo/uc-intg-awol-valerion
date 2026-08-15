@@ -15,11 +15,11 @@ from dataclasses import dataclass, field
 from uc_intg_awol_valerion import Loggers
 from uc_intg_awol_valerion.const import (
     AVMUTE_MUTED,
-    AwolValerionCommands,
-    AwolValerionStates,
     ERST_COMPONENTS,
     ERST_LEVELS,
     PJLINK_POWER,
+    AwolValerionCommands,
+    AwolValerionStates,
 )
 
 _LOG = logging.getLogger(Loggers.PJLINK)
@@ -64,6 +64,7 @@ class PJLinkClient:
     """Talks PJLink to a single projector."""
 
     def __init__(self, host: str, port: int, password: str = "") -> None:
+        """Initialize the client."""
         self._host = host
         self._port = port
         self._password = password or ""
@@ -71,6 +72,7 @@ class PJLinkClient:
 
     @property
     def host(self) -> str:
+        """Return the host address."""
         return self._host
 
     async def _send(self, command: str) -> str:
@@ -130,22 +132,26 @@ class PJLinkClient:
         return value is not None
 
     async def get_power(self) -> AwolValerionStates:
+        """Return the projector's current power state."""
         value = self._value(await self._send(AwolValerionCommands.GET_POWER))
         if self._is_err(value):
             return AwolValerionStates.UNAVAILABLE
         return PJLINK_POWER.get(value, AwolValerionStates.UNAVAILABLE)
 
     async def get_input(self) -> str | None:
+        """Return the projector's current input code (e.g. ``HDMI1``)."""
         value = self._value(await self._send(AwolValerionCommands.GET_INPUT))
         return None if self._is_err(value) else value
 
     async def get_av_mute(self) -> bool:
+        """Return True if the projector's audio and video output is muted."""
         value = self._value(await self._send(AwolValerionCommands.GET_AVMUTE))
         if self._is_err(value):
             return False
         return value in AVMUTE_MUTED
 
     async def get_errors(self) -> tuple[dict[str, str], bool]:
+        """Return a dict of component errors and a bool indicating if there are any."""
         value = self._value(await self._send(AwolValerionCommands.GET_ERRORS))
         if self._is_err(value) or len(value) < 6:
             return {}, False
@@ -205,16 +211,24 @@ class PJLinkClient:
 
     # -- commands -----------------------------------------------------------
     async def power_on(self) -> None:
+        """Power on the projector."""
         await self._send(AwolValerionCommands.POWER_ON)
 
     async def power_off(self) -> None:
+        """Power off the projector."""
         await self._send(AwolValerionCommands.POWER_OFF)
 
     async def select_input(self, code: str) -> None:
+        """Select a different input."""
         await self._send(AwolValerionCommands.SET_INPUT.format(code=code))
 
     async def set_av_mute(self, muted: bool) -> None:
-        await self._send(AwolValerionCommands.SET_AVMUTE_ON if muted else AwolValerionCommands.SET_AVMUTE_OFF)
+        """Mute/unmute the projector's audio and video output."""
+        await self._send(
+            AwolValerionCommands.SET_AVMUTE_ON
+            if muted
+            else AwolValerionCommands.SET_AVMUTE_OFF
+        )
 
     async def send_raw(self, command: str) -> str:
         """Send a raw PJLink command string (e.g. ``%1INPT 32``)."""
