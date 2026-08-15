@@ -127,7 +127,7 @@ class AwolValerionSetupFlow(BaseSetupFlow[AwolValerionConfig]):
                 port=int(port),
             )
 
-            identity = await self._probe(config)
+            identity = await self._test_connection(config)
             if identity is not None:
                 _LOG.info("Detected %s on address %s", identity.product, address)
             else:
@@ -151,8 +151,8 @@ class AwolValerionSetupFlow(BaseSetupFlow[AwolValerionConfig]):
             _LOG.info("Please verify the device address and try again")
             return SetupError(IntegrationSetupError.CONNECTION_REFUSED)
 
-    async def _probe(self, config: AwolValerionConfig) -> PJLinkIdentity | None:
-        """Try each candidate transport; return (identity, protocol_name) or empty."""
+    async def _test_connection(self, config: AwolValerionConfig) -> PJLinkIdentity | None:
+        """Try to connect to the projector; return identity or empty."""
         client = PJLinkClient(config.address, config.port, config.password)
         try:
             if await client.test():
