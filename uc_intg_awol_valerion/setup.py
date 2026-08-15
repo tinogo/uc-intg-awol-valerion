@@ -151,7 +151,9 @@ class AwolValerionSetupFlow(BaseSetupFlow[AwolValerionConfig]):
             _LOG.info("Please verify the device address and try again")
             return SetupError(IntegrationSetupError.CONNECTION_REFUSED)
 
-    async def _test_connection(self, config: AwolValerionConfig) -> PJLinkIdentity | None:
+    async def _test_connection(
+        self, config: AwolValerionConfig
+    ) -> PJLinkIdentity | None:
         """Try to connect to the projector; return identity or empty."""
         client = PJLinkClient(config.address, config.port, config.password)
         try:

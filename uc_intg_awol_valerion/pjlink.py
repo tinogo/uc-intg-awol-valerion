@@ -12,10 +12,10 @@ import hashlib
 import logging
 from dataclasses import dataclass, field
 
-from uc_intg_awol_valerion import Loggers
 from uc_intg_awol_valerion.const import (
     AwolValerionCommands,
     AwolValerionStates,
+    Loggers,
 )
 
 _LOG = logging.getLogger(Loggers.PJLINK)
@@ -23,9 +23,9 @@ _LOG = logging.getLogger(Loggers.PJLINK)
 # PJLink power reply codes (from ``%1POWR ?`` / ``%1POWR=<n>``)
 # PJLink power reply codes (from ``%1POWR ?`` / ``%1POWR=<n>``)
 PJLINK_POWER = {
-    "0": AwolValerionStates.OFF, # standby
+    "0": AwolValerionStates.OFF,  # standby
     "1": AwolValerionStates.ON,  # on
-    "2": AwolValerionStates.OFF, # off
+    "2": AwolValerionStates.OFF,  # off
 }
 
 # PJLink AV-mute reply codes (``%1AVMT=<n>``): 30 off, 11/21/31 muted
@@ -49,12 +49,14 @@ class PJLinkStatus:
     power: AwolValerionStates = AwolValerionStates.UNAVAILABLE
     reachable: bool = False
     input_code: str | None = None
-    input_list: dict[str, str] = field(default_factory=lambda: {
-        "Home": "30",
-        "HDMI 1": "31",
-        "HDMI 2": "32",
-        "HDMI 3": "33",
-    })
+    input_list: dict[str, str] = field(
+        default_factory=lambda: {
+            "Home": "30",
+            "HDMI 1": "31",
+            "HDMI 2": "32",
+            "HDMI 3": "33",
+        }
+    )
     av_muted: bool = False
     volume: int = 0
 
