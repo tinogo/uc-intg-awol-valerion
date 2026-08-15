@@ -20,6 +20,7 @@ It also heavily borrows code from the [Epson projector integration](https://gith
 ## Supported entity types
 
 - [Media player](#media-player-entity)
+- [Remote](#remote-entity)
 
 ### Media Player entity
 
@@ -36,6 +37,18 @@ The Media Player entity implements the following features:
 - `SELECT_SOURCE`: Provides a dropdown of available sources
 
 The entity doesn't provide any of the playback features, though, as the PJLink-API doesn't provide any of those commands.
+
+### Remote entity
+
+The Media Player entity implements the following features:
+- `ON_OFF`: Provides dedicated on/off commands
+- `TOGGLE`: Provides the power toggle
+- `SEND_CMD`: Allows sending a command to the device
+- `SEND_CMD_SEQUENCE`: Allows sending a command sequence to the device
+
+Furthermore, it implements many Simple-Commands.
+
+The commands `SEND_CMD` and `SEND_CMD_SEQUENCE` allow the user to send any supported PJLink-commands (see https://support.valerion.com/hc/en-us/articles/17088458288143-What-is-AWOL-Link for reference).
 
 ## Installation instructions
 
