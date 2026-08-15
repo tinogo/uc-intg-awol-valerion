@@ -17,6 +17,7 @@ from uc_intg_awol_valerion.config import AwolValerionConfig
 from uc_intg_awol_valerion.const import Loggers
 from uc_intg_awol_valerion.device import AwolValerionDevice
 from uc_intg_awol_valerion.media_player import AwolValerionMediaPlayer
+from uc_intg_awol_valerion.remote import AwolValerionRemote
 from uc_intg_awol_valerion.setup import AwolValerionSetupFlow
 
 
@@ -34,6 +35,7 @@ async def main():
         device_class=AwolValerionDevice,
         entity_classes=[
             AwolValerionMediaPlayer,
+            AwolValerionRemote,
         ],
     )
 

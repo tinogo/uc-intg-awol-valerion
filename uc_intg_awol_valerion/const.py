@@ -9,6 +9,7 @@ This module contains constants used throughout the integration.
 from enum import StrEnum
 
 from ucapi.media_player import States as MediaPlayerStates
+from ucapi.remote import States as RemoteStates
 
 
 class Loggers(StrEnum):
@@ -16,6 +17,7 @@ class Loggers(StrEnum):
 
     DRIVER = "driver"
     MEDIA_PLAYER = "media_player"
+    REMOTE = "remote"
     DEVICE = "device"
     PJLINK = "pjlink"
     SETUP_FLOW = "setup_flow"
@@ -91,4 +93,11 @@ MEDIA_PLAYER_STATE_MAPPING = {
     AwolValerionStates.OFF: MediaPlayerStates.OFF,
     AwolValerionStates.UNAVAILABLE: MediaPlayerStates.UNAVAILABLE,
     AwolValerionStates.UNKNOWN: MediaPlayerStates.UNKNOWN,
+}
+
+REMOTE_STATE_MAPPING = {
+    AwolValerionStates.ON: RemoteStates.ON,
+    AwolValerionStates.OFF: RemoteStates.OFF,
+    AwolValerionStates.UNAVAILABLE: RemoteStates.UNAVAILABLE,
+    AwolValerionStates.UNKNOWN: RemoteStates.UNKNOWN,
 }
