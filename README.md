@@ -23,14 +23,26 @@ It also heavily boroughs code from the [Epson projector integration](https://git
 
 ### Media Player entity
 
-tba
+The Media Player entity implements the following features:
+- `ON_OFF`: Provides dedicated on/off commands
+- `DPAD`: Enables navigating your projector's OSD
+- `TOGGLE`: Provides the power toggle
+- `VOLUME`: Enables adjusting the volume slider via the Remote 3's touch slider
+- `VOLUME_UP_DOWN`: Provides dedicated volume up/down commands
+- `HOME`: Provides the home and back commands.
+- `MUTE`: Mutes the device
+- `UNMUTE`: Unmutes the device
+- `MUTE_TOGGLE`: Toggles the mute state of the device
+- `SELECT_SOURCE`: Provides a dropdown of available sources
 
+The entity doesn't provide any of the playback features, though, as the PJLink-API doesn't provide any of those commands.
 
 ## Installation instructions
 
-1. Download the integration package (tar.gz file) from the [Releases](https://github.com/tinogo/uc-intg-awol-valerion/releases) page
-2. Upload the archive via the Remote's web configurator: "Integrations" → "Install custom"
-3. Configure your device through the setup wizard
+1. Ensure that you've enabled the "AWOL Link" feature in your projector's settings (it requires the latest Q0718 firmware or later).
+2. Download the integration package (tar.gz file) from the [Releases](https://github.com/tinogo/uc-intg-awol-valerion/releases) page
+3. Upload the archive via the Remote's web configurator: "Integrations" → "Install custom"
+4. Configure your device through the setup wizard
 
 ## Update instructions
 
