@@ -28,16 +28,12 @@ class AwolValerionStates(StrEnum):
     UNAVAILABLE = "UNAVAILABLE"
     OFF = "OFF"
     ON = "ON"
-    WARMING = "WARMING"
-    COOLING = "COOLING"
 
 # PJLink power reply codes (from ``%1POWR ?`` / ``%1POWR=<n>``)
 # PJLink power reply codes (from ``%1POWR ?`` / ``%1POWR=<n>``)
 PJLINK_POWER = {
     "0": AwolValerionStates.OFF,       # standby
     "1": AwolValerionStates.ON,        # lamp on
-    "2": AwolValerionStates.COOLING,   # cooling down
-    "3": AwolValerionStates.WARMING,   # warm-up
 }
 
 # PJLink AV-mute reply codes (``%1AVMT=<n>``): 30 off, 11/21/31 muted

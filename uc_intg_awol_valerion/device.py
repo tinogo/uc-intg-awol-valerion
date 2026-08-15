@@ -79,7 +79,6 @@ class AwolValerionDevice(PollingDevice):
     def power(self) -> bool:
         return self._status.power in (
             const.AwolValerionStates.ON,
-            const.AwolValerionStates.WARMING,
         )
 
     async def establish_connection(self) -> Any:
