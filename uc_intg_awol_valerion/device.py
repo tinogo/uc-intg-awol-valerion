@@ -20,7 +20,12 @@ from uc_intg_awol_valerion.const import (
     AwolValerionStates,
     Loggers,
 )
-from uc_intg_awol_valerion.pjlink import PJLinkAuthError, PJLinkClient, PJLinkIdentity, PJLinkStatus
+from uc_intg_awol_valerion.pjlink import (
+    PJLinkAuthError,
+    PJLinkClient,
+    PJLinkIdentity,
+    PJLinkStatus,
+)
 
 _LOG = logging.getLogger(Loggers.DEVICE)
 
@@ -77,9 +82,7 @@ class AwolValerionDevice(PollingDevice):
 
     @property
     def power(self) -> bool:
-        return self._status.power in (
-            const.AwolValerionStates.ON,
-        )
+        return self._status.power in (const.AwolValerionStates.ON,)
 
     async def establish_connection(self) -> Any:
         """Establish the initial connection to the projector."""
@@ -101,9 +104,7 @@ class AwolValerionDevice(PollingDevice):
             self._identity = await self._client.get_identity()
             self._identity_loaded = True
         except PJLinkAuthError:
-            _LOG.error(
-                "[%s] Authentication failed!", self.log_id
-            )
+            _LOG.error("[%s] Authentication failed!", self.log_id)
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.info("[%s] Identity not available yet: %s", self.log_id, err)
 
@@ -111,9 +112,7 @@ class AwolValerionDevice(PollingDevice):
         try:
             new_status = await self._client.poll()
         except PJLinkAuthError:
-            _LOG.error(
-                "[%s] Authentication failed!", self.log_id
-            )
+            _LOG.error("[%s] Authentication failed!", self.log_id)
             new_status = PJLinkStatus()
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.debug("[%s] Poll failed: %s", self.log_id, err)
@@ -138,9 +137,7 @@ class AwolValerionDevice(PollingDevice):
             await self._client.power_on()
             ok = True
         except Exception as err:  # pylint: disable=broad-exception-caught
-            _LOG.info(
-                "[%s] power-on failed: %s", self.log_id, err
-            )
+            _LOG.info("[%s] power-on failed: %s", self.log_id, err)
         return ok
 
     async def power_off(self) -> bool:
@@ -149,9 +146,7 @@ class AwolValerionDevice(PollingDevice):
             await self._client.power_off()
             ok = True
         except Exception as err:  # pylint: disable=broad-exception-caught
-            _LOG.info(
-                "[%s] power-off failed: %s", self.log_id, err
-            )
+            _LOG.info("[%s] power-off failed: %s", self.log_id, err)
         return ok
 
     async def power_toggle(self) -> bool:
@@ -183,6 +178,33 @@ class AwolValerionDevice(PollingDevice):
 
     async def av_mute_toggle(self) -> bool:
         return await self._set_av_mute(not self._status.av_muted)
+
+    async def cursor_up(self) -> bool:
+        return await self.send_raw(const.AwolValerionCommands.CURSOR_UP)
+
+    async def cursor_down(self) -> bool:
+        return await self.send_raw(const.AwolValerionCommands.CURSOR_DOWN)
+
+    async def cursor_left(self) -> bool:
+        return await self.send_raw(const.AwolValerionCommands.CURSOR_LEFT)
+
+    async def cursor_right(self) -> bool:
+        return await self.send_raw(const.AwolValerionCommands.CURSOR_RIGHT)
+
+    async def cursor_enter(self) -> bool:
+        return await self.send_raw(const.AwolValerionCommands.CURSOR_OK)
+
+    async def back(self) -> bool:
+        return await self.send_raw(const.AwolValerionCommands.RETURN)
+
+    async def home(self) -> bool:
+        return await self.send_raw(const.AwolValerionCommands.HOME)
+
+    async def volume_up(self) -> bool:
+        return await self.send_raw(const.AwolValerionCommands.VOLUME_UP)
+
+    async def volume_down(self) -> bool:
+        return await self.send_raw(const.AwolValerionCommands.VOLUME_DOWN)
 
     async def send_raw(self, command: str) -> bool:
         try:

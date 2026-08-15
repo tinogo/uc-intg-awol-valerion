@@ -29,11 +29,12 @@ class AwolValerionStates(StrEnum):
     OFF = "OFF"
     ON = "ON"
 
+
 # PJLink power reply codes (from ``%1POWR ?`` / ``%1POWR=<n>``)
 # PJLink power reply codes (from ``%1POWR ?`` / ``%1POWR=<n>``)
 PJLINK_POWER = {
-    "0": AwolValerionStates.OFF,       # standby
-    "1": AwolValerionStates.ON,        # lamp on
+    "0": AwolValerionStates.OFF,  # standby
+    "1": AwolValerionStates.ON,  # lamp on
 }
 
 # PJLink AV-mute reply codes (``%1AVMT=<n>``): 30 off, 11/21/31 muted
@@ -53,6 +54,7 @@ PJLINK_INPUT_NAMES = {
 }
 PJLINK_INPUT_NAMES_INV = {v: k for k, v in PJLINK_INPUT_NAMES.items()}
 
+
 class AwolValerionCommands(StrEnum):
     """Defines the possible commands of the AWOL Valerion projector."""
 
@@ -65,7 +67,6 @@ class AwolValerionCommands(StrEnum):
     GET_AVMUTE = "%1AVMT ?"
     SET_AVMUTE_ON = "%1AVMT 31"
     SET_AVMUTE_OFF = "%1AVMT 30"
-    GET_LAMP = "%1LAMP ?"
     GET_ERRORS = "%1ERST ?"
     GET_NAME = "%1NAME ?"
     GET_MANUFACTURER = "%1INF1 ?"
@@ -74,7 +75,18 @@ class AwolValerionCommands(StrEnum):
     GET_CLASS = "%2CLSS ?"
     GET_SW_VERSION = "%2SVER ?"
     GET_REC_RESOLUTION = "%2RRES ?"
-    GET_FILTER_USAGE = "%2FILT ?"
+    CURSOR_UP = "%3RCNC 0"
+    CURSOR_DOWN = "%3RCNC 1"
+    CURSOR_LEFT = "%3RCNC 2"
+    CURSOR_RIGHT = "%3RCNC 3"
+    CURSOR_OK = "%3RCNC 4"
+    RETURN = "%3RCNC 5"
+    MENU = "%3RCNC 6"
+    SETTINGS = "%3RCNC 7"
+    HOME = "%3RCNC 8"
+    VOLUME_DOWN = "%2SVOL 0"
+    VOLUME_UP = "%2SVOL 1"
+
 
 MEDIA_PLAYER_STATE_MAPPING = {
     AwolValerionStates.ON: MediaPlayerStates.ON,
