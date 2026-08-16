@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.3.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.2.0...v0.3.0) (2026-08-16)
+
+
+### Features
+
+* **#10:** add support for various sensors ([daa7889](https://github.com/tinogo/uc-intg-awol-valerion/commit/daa7889edd5700cbec9377eb765cd95c1fca65ff))
+
+
+### Bug Fixes
+
+* Valerion projectors only allow muting the audio, but not the video output ([15c150d](https://github.com/tinogo/uc-intg-awol-valerion/commit/15c150d6b7870fe445357a066728d9ac2589344a))
+
+
+### Documentation
+
+* add an important note to let the authentication disabled for the AWOL Link protocol (for now) ([56049e3](https://github.com/tinogo/uc-intg-awol-valerion/commit/56049e37854f73960fa0a07f7344b60cbe8a6de6))
+
 ## [0.2.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.1.0...v0.2.0) (2026-08-15)
 
 
