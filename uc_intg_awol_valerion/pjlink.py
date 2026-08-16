@@ -126,6 +126,32 @@ class PJLinkStatus:
         }
     )
     picture_mode: str | None = None
+    picture_mode_list: list[str] = field(
+        default_factory=lambda: [
+            "Standard",
+            "Vivid",
+            "Sports",
+            "Energy Saving",
+            "PC/Game",
+            "Theater",
+            "FILMMAKER MODE",
+            "HDR Standard",
+            "HDR Vivid",
+            "HDR Sports",
+            "HDR Energy Saving",
+            "HDR Game",
+            "HDR Theater",
+            "IMAX Mode",
+            "HDR10+ Standard",
+            "HDR10+ Vivid",
+            "HDR10+ Game",
+            "HDR10+ Theater",
+            "Dolby Vision Bright",
+            "Dolby Vision Dark",
+            "Dolby Vision Custom",
+            "Dolby Vision Game",
+        ]
+    )
     signal_info: str | None = None
     temperature: str | None = None
 
@@ -430,11 +456,11 @@ class PJLinkClient:
     # -- commands -----------------------------------------------------------
     async def power_on(self) -> None:
         """Power on the projector."""
-        await self._send(AwolValerionCommands.POWER_ON)
+        await self._send(AwolValerionCommands.SET_POWER_ON)
 
     async def power_off(self) -> None:
         """Power off the projector."""
-        await self._send(AwolValerionCommands.POWER_OFF)
+        await self._send(AwolValerionCommands.SET_POWER_OFF)
 
     async def select_input(self, code: str) -> None:
         """Select a different input."""
