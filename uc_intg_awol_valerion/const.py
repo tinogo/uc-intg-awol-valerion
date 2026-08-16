@@ -117,7 +117,7 @@ class SelectType(StrEnum):
     DYNAMIC_TONE_MAPPING = "dynamic_tone_mapping"
     EBL = "ebl"
     GAMMA = "gamma"
-    MOTION_ENHANCEMENT = "ebl"
+    MOTION_ENHANCEMENT = "motion_enhancement"
     PICTURE_MODE = "picture_mode"
 
 
