@@ -261,12 +261,12 @@ class PJLinkStatus:
     def fan_rpm_values(self) -> tuple[str | None, str | None]:
         """Return the first two fan RPM values from the raw fan speed reply."""
         if self.fan_speed is None:
-            return (None, None)
+            return None, None
 
         values = self.fan_speed.split()
         fan_1 = values[0] if len(values) > 0 else None
         fan_2 = values[1] if len(values) > 1 else None
-        return (fan_1, fan_2)
+        return fan_1, fan_2
 
     @property
     def fan_speed_display(self) -> str | None:
@@ -275,6 +275,25 @@ class PJLinkStatus:
         if fan_1 is None or fan_2 is None:
             return None
         return f"FAN 1: {fan_1} RPM | FAN 2: {fan_2} RPM"
+
+    @property
+    def temperature_values(self) -> tuple[str | None, str | None]:
+        """Return the first two temperature values from the raw temperature reply."""
+        if self.temperature is None:
+            return None, None
+
+        values = self.temperature.split()
+        temp_1 = values[0] if len(values) > 0 else None
+        temp_2 = values[1] if len(values) > 1 else None
+        return temp_1, temp_2
+
+    @property
+    def temperature_display(self) -> str | None:
+        """Return a human-friendly temperature string for Temp 1 and Temp 2."""
+        temp_1, temp_2 = self.temperature_values
+        if temp_1 is None or temp_2 is None:
+            return None
+        return f"Temp 1: {temp_1}°C | Temp 2: {temp_2}°C"
 
 
 @dataclass

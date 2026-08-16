@@ -239,5 +239,5 @@ class AwolValerionSensor(Sensor, Entity):  # pylint: disable=too-few-public-meth
         """Get the temperature sensor attributes."""
         return {
             SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.temperature),
+            SensorAttr.VALUE: str(self._device.status.temperature_display),
         }
