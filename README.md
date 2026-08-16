@@ -21,6 +21,7 @@ It also heavily borrows code from the [Epson projector integration](https://gith
 
 - [Media player](#media-player-entity)
 - [Remote](#remote-entity)
+- [Selects](#select-entity)
 - [Sensors](#sensor-entity)
 
 ### Media Player entity
@@ -50,6 +51,16 @@ The Media Player entity implements the following features:
 Furthermore, it implements many Simple-Commands.
 
 The commands `SEND_CMD` and `SEND_CMD_SEQUENCE` allow the user to send any supported PJLink-commands (see https://support.valerion.com/hc/en-us/articles/17088458288143-What-is-AWOL-Link for reference).
+
+### Select entity
+
+This integration provides the following Select-Types:
+- Changing the Color Temperature
+- Changing the Dynamic Tone Mapping
+- Changing the EBL mode
+- Changing the Gamma curve
+- Changing the Motion Enhancement mode
+- Changing the Picture mode
 
 ### Sensor entity
 
@@ -109,6 +120,7 @@ The major changes found in each new release are listed in the [changelog](https:
 │   ├── media_player.py      # Media player entity
 │   ├── pjlink.py            # The basic PJLink-client communicating with the AWOL Valerion projectors
 │   ├── remote.py            # Remote entity
+│   ├── select.py            # Select entity
 │   ├── sensor.py            # Sensor entity
 │   └── setup.py             # Setup flow and user configuration
 ├── config/                  # Runtime configuration storage
