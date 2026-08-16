@@ -108,6 +108,8 @@ The major changes found in each new release are listed in the [changelog](https:
 │   ├── driver.py            # Integration Driver
 │   ├── media_player.py      # Media player entity
 │   ├── pjlink.py            # The basic PJLink-client communicating with the AWOL Valerion projectors
+│   ├── remote.py            # Remote entity
+│   ├── sensor.py            # Sensor entity
 │   └── setup.py             # Setup flow and user configuration
 ├── config/                  # Runtime configuration storage
 ├── Dockerfile               # Container build configuration

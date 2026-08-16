@@ -10,6 +10,7 @@ from enum import StrEnum
 
 from ucapi.media_player import States as MediaPlayerStates
 from ucapi.remote import States as RemoteStates
+from ucapi.select import States as SelectStates
 from ucapi.sensor import States as SensorStates
 
 
@@ -21,6 +22,7 @@ class Loggers(StrEnum):
     REMOTE = "remote"
     DEVICE = "device"
     PJLINK = "pjlink"
+    SELECT = "select"
     SENSOR = "sensor"
     SETUP_FLOW = "setup_flow"
 
@@ -60,14 +62,9 @@ class AwolValerionStates(StrEnum):
 class AwolValerionCommands(StrEnum):
     """Defines the possible commands of the AWOL Valerion projector."""
 
-    POWER_ON = "%1POWR 1"
-    POWER_OFF = "%1POWR 0"
     GET_POWER = "%1POWR ?"
     GET_INPUT = "%1INPT ?"
-    SET_INPUT = "%1INPT {code}"
     GET_AVMUTE = "%1AVMT ?"
-    SET_MUTE_ON = "%1AVMT 21"
-    SET_MUTE_OFF = "%1AVMT 20"
     GET_NAME = "%1NAME ?"
     GET_MANUFACTURER = "%1INF1 ?"
     GET_PRODUCT = "%1INF2 ?"
@@ -88,18 +85,40 @@ class AwolValerionCommands(StrEnum):
     GET_SIGNAL_INFO = "%3SINF ?"
     GET_TEMPERATURE = "%3TEMP ?"
     GET_VOLUME = "%3VOLM ?"
-    CURSOR_UP = "%3RCNC 0"
-    CURSOR_DOWN = "%3RCNC 1"
-    CURSOR_LEFT = "%3RCNC 2"
-    CURSOR_RIGHT = "%3RCNC 3"
-    CURSOR_OK = "%3RCNC 4"
-    RETURN = "%3RCNC 5"
-    MENU = "%3RCNC 6"
-    SETTINGS = "%3RCNC 7"
-    HOME = "%3RCNC 8"
-    VOLUME_DOWN = "%2SVOL 0"
-    VOLUME_UP = "%2SVOL 1"
-    VOLUME_X_FORMAT = "%3VOLM {}"
+    SET_COLOR_TEMPERATURE = "%3CLTP {}"
+    SET_DYNAMIC_TONE_MAPPING = "%3DYTM {}"
+    SET_EBL = "%3ENBL {}"
+    SET_GAMMA = "%3GAMA {}"
+    SET_MOTION_ENHANCEMENT = "%3MOTN {}"
+    SET_PICTURE_MODE = "%3PICT {}"
+    SET_POWER_ON = "%1POWR 1"
+    SET_POWER_OFF = "%1POWR 0"
+    SET_INPUT = "%1INPT {code}"
+    SET_MUTE_ON = "%1AVMT 21"
+    SET_MUTE_OFF = "%1AVMT 20"
+    SET_CURSOR_UP = "%3RCNC 0"
+    SET_CURSOR_DOWN = "%3RCNC 1"
+    SET_CURSOR_LEFT = "%3RCNC 2"
+    SET_CURSOR_RIGHT = "%3RCNC 3"
+    SET_CURSOR_OK = "%3RCNC 4"
+    SET_RETURN = "%3RCNC 5"
+    SET_MENU = "%3RCNC 6"
+    SET_SETTINGS = "%3RCNC 7"
+    SET_HOME = "%3RCNC 8"
+    SET_VOLUME_DOWN = "%2SVOL 0"
+    SET_VOLUME_UP = "%2SVOL 1"
+    SET_VOLUME_X_FORMAT = "%3VOLM {}"
+
+
+class SelectType(StrEnum):
+    """Defines the supported select types for AWOl Valerion projectors."""
+
+    COLOR_TEMPERATURE = "color_temperature"
+    DYNAMIC_TONE_MAPPING = "dynamic_tone_mapping"
+    EBL = "ebl"
+    GAMMA = "gamma"
+    MOTION_ENHANCEMENT = "motion_enhancement"
+    PICTURE_MODE = "picture_mode"
 
 
 class SensorType(StrEnum):
@@ -135,6 +154,13 @@ REMOTE_STATE_MAPPING = {
     AwolValerionStates.OFF: RemoteStates.OFF,
     AwolValerionStates.UNAVAILABLE: RemoteStates.UNAVAILABLE,
     AwolValerionStates.UNKNOWN: RemoteStates.UNKNOWN,
+}
+
+SELECT_STATE_MAPPING = {
+    AwolValerionStates.ON: SelectStates.ON,
+    AwolValerionStates.OFF: SelectStates.UNAVAILABLE,
+    AwolValerionStates.UNAVAILABLE: SelectStates.UNAVAILABLE,
+    AwolValerionStates.UNKNOWN: SelectStates.UNKNOWN,
 }
 
 SENSOR_STATE_MAPPING = {

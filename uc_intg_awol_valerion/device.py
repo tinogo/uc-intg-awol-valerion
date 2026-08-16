@@ -202,54 +202,54 @@ class AwolValerionDevice(PollingDevice):
 
     async def cursor_up(self) -> bool:
         """Move the cursor up in the projector's OSD."""
-        return await self.send_raw(const.AwolValerionCommands.CURSOR_UP)
+        return await self.send_raw(const.AwolValerionCommands.SET_CURSOR_UP)
 
     async def cursor_down(self) -> bool:
         """Move the cursor down in the projector's OSD."""
-        return await self.send_raw(const.AwolValerionCommands.CURSOR_DOWN)
+        return await self.send_raw(const.AwolValerionCommands.SET_CURSOR_DOWN)
 
     async def cursor_left(self) -> bool:
         """Move the cursor left in the projector's OSD."""
-        return await self.send_raw(const.AwolValerionCommands.CURSOR_LEFT)
+        return await self.send_raw(const.AwolValerionCommands.SET_CURSOR_LEFT)
 
     async def cursor_right(self) -> bool:
         """Move the cursor right in the projector's OSD."""
-        return await self.send_raw(const.AwolValerionCommands.CURSOR_RIGHT)
+        return await self.send_raw(const.AwolValerionCommands.SET_CURSOR_RIGHT)
 
     async def cursor_enter(self) -> bool:
         """Presses the OK key in the projector's OSD."""
-        return await self.send_raw(const.AwolValerionCommands.CURSOR_OK)
+        return await self.send_raw(const.AwolValerionCommands.SET_CURSOR_OK)
 
     async def back(self) -> bool:
         """Presses the BACK key in the projector's OSD."""
-        return await self.send_raw(const.AwolValerionCommands.RETURN)
+        return await self.send_raw(const.AwolValerionCommands.SET_RETURN)
 
     async def home(self) -> bool:
         """Show the home screen of the projector."""
-        return await self.send_raw(const.AwolValerionCommands.HOME)
+        return await self.send_raw(const.AwolValerionCommands.SET_HOME)
 
     async def menu(self) -> bool:
         """Show the menu of the projector."""
-        return await self.send_raw(const.AwolValerionCommands.MENU)
+        return await self.send_raw(const.AwolValerionCommands.SET_MENU)
 
     async def settings(self) -> bool:
         """Show the settings of the projector."""
-        return await self.send_raw(const.AwolValerionCommands.SETTINGS)
+        return await self.send_raw(const.AwolValerionCommands.SET_SETTINGS)
 
     async def volume_up(self) -> bool:
         """Increase the projector's volume."""
-        return await self.send_raw(const.AwolValerionCommands.VOLUME_UP)
+        return await self.send_raw(const.AwolValerionCommands.SET_VOLUME_UP)
 
     async def volume_down(self) -> bool:
         """Decrease the projector's volume."""
-        return await self.send_raw(const.AwolValerionCommands.VOLUME_DOWN)
+        return await self.send_raw(const.AwolValerionCommands.SET_VOLUME_DOWN)
 
     async def volume_x(self, volume) -> bool:
         """Set the projector's volume to a specific level."""
         sanitized_volume = max(MIN_VOLUME, min(MAX_VOLUME, int(volume)))
 
         return await self.send_raw(
-            const.AwolValerionCommands.VOLUME_X_FORMAT.format(sanitized_volume)
+            const.AwolValerionCommands.SET_VOLUME_X_FORMAT.format(sanitized_volume)
         )
 
     async def send_raw(self, command: str) -> bool:
