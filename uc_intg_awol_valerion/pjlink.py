@@ -257,6 +257,25 @@ class PJLinkStatus:
         except ValueError:
             return None
 
+    @property
+    def fan_rpm_values(self) -> tuple[str | None, str | None]:
+        """Return the first two fan RPM values from the raw fan speed reply."""
+        if self.fan_speed is None:
+            return (None, None)
+
+        values = self.fan_speed.split()
+        fan_1 = values[0] if len(values) > 0 else None
+        fan_2 = values[1] if len(values) > 1 else None
+        return (fan_1, fan_2)
+
+    @property
+    def fan_speed_display(self) -> str | None:
+        """Return a human-friendly fan speed string for FAN 1 and FAN 2."""
+        fan_1, fan_2 = self.fan_rpm_values
+        if fan_1 is None or fan_2 is None:
+            return None
+        return f"FAN 1: {fan_1} RPM | FAN 2: {fan_2} RPM"
+
 
 @dataclass
 class PJLinkIdentity:

@@ -197,7 +197,7 @@ class AwolValerionSensor(Sensor, Entity):  # pylint: disable=too-few-public-meth
         """Get the fan speed sensor attributes."""
         return {
             SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.fan_speed),
+            SensorAttr.VALUE: str(self._device.status.fan_speed_display),
         }
 
     def _get_gamma_sensor_attributes(self) -> dict[str, Any]:
