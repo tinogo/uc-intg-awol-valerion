@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.5.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.4.0...v0.5.0) (2026-08-16)
+
+
+### Features
+
+* improve the visuals of the fan speed sensor ([73dbc93](https://github.com/tinogo/uc-intg-awol-valerion/commit/73dbc93a229922370541da325ebcdc3deae842ca))
+* improve the visuals of the temperature sensor ([8ebb8b4](https://github.com/tinogo/uc-intg-awol-valerion/commit/8ebb8b43ff4e5fd8510a641dc3e30ff042d12f0b))
+* refresh the device state after sending a command ([a82ae40](https://github.com/tinogo/uc-intg-awol-valerion/commit/a82ae40887d5740ba77808b1010b39b5cf436fbd))
+
+
+### Bug Fixes
+
+* fix changing the Select entity options ([45ed99c](https://github.com/tinogo/uc-intg-awol-valerion/commit/45ed99cf05bc19a7e326e39376f2baebee6c0c33))
+
 ## [0.4.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.3.0...v0.4.0) (2026-08-16)
 
 
