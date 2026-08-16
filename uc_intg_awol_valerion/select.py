@@ -119,6 +119,24 @@ class AwolValerionSelect(Select, Entity):
 
         return await self._handle_select_command(cmd_id, params, command_template)
 
+    def _map_option_to_device_value(self, option: str) -> str | None:  # pylint: disable=too-many-return-statements
+        """Map UI option labels to projector values for dict-backed select entities."""
+        match self._select_type:
+            case SelectType.COLOR_TEMPERATURE:
+                return self._device.status.color_temperature_list.get(option)
+            case SelectType.DYNAMIC_TONE_MAPPING:
+                return self._device.status.dynamic_tone_mapping_list.get(option)
+            case SelectType.EBL:
+                return self._device.status.ebl_list.get(option)
+            case SelectType.GAMMA:
+                return self._device.status.gamma_list.get(option)
+            case SelectType.MOTION_ENHANCEMENT:
+                return self._device.status.motion_enhancement_list.get(option)
+            case SelectType.PICTURE_MODE:
+                return option
+            case _:
+                return None
+
     async def _handle_select_command(  # pylint: disable=too-many-branches
         self, cmd_id: str, params: dict[str, Any] | None, command_template: str
     ) -> Literal[StatusCodes.OK]:
@@ -158,7 +176,9 @@ class AwolValerionSelect(Select, Entity):
                         target_option = options[-1]
 
         if target_option is not None:
-            await self._device.send_raw(command_template.format(target_option))
+            device_value = self._map_option_to_device_value(target_option)
+            if device_value is not None:
+                await self._device.send_raw(command_template.format(device_value))
 
         return StatusCodes.OK
 
