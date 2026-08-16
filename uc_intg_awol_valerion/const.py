@@ -10,6 +10,7 @@ from enum import StrEnum
 
 from ucapi.media_player import States as MediaPlayerStates
 from ucapi.remote import States as RemoteStates
+from ucapi.sensor import States as SensorStates
 
 
 class Loggers(StrEnum):
@@ -20,6 +21,7 @@ class Loggers(StrEnum):
     REMOTE = "remote"
     DEVICE = "device"
     PJLINK = "pjlink"
+    SENSOR = "sensor"
     SETUP_FLOW = "setup_flow"
 
 
@@ -72,7 +74,19 @@ class AwolValerionCommands(StrEnum):
     GET_OTHER_INFO = "%1INFO ?"
     GET_CLASS = "%2CLSS ?"
     GET_SW_VERSION = "%2SVER ?"
+    GET_INPUT_RESOLUTION = "%2IRES ?"
+    GET_ASPECT_RATIO = "%3ASPR ?"
+    GET_COLOR_TEMPERATURE = "%3CLTP ?"
+    GET_DYNAMIC_TONE_MAPPING = "%3DYTM ?"
+    GET_EBL = "%3ENBL ?"
+    GET_FAN_SPEED = "%3FANS ?"
+    GET_GAMMA = "%3GAMA ?"
+    GET_LASER_LUMINANCE = "%3LASL ?"
+    GET_MOTION_ENHANCEMENT = "%3MOTN ?"
     GET_REC_RESOLUTION = "%2RRES ?"
+    GET_PICTURE_MODE = "%3PICT ?"
+    GET_SIGNAL_INFO = "%3SINF ?"
+    GET_TEMPERATURE = "%3TEMP ?"
     GET_VOLUME = "%3VOLM ?"
     CURSOR_UP = "%3RCNC 0"
     CURSOR_DOWN = "%3RCNC 1"
@@ -88,6 +102,27 @@ class AwolValerionCommands(StrEnum):
     VOLUME_X_FORMAT = "%3VOLM {}"
 
 
+class SensorType(StrEnum):
+    """Defines the supported sensor types for AWOL Valerion projectors."""
+
+    MUTE = "mute"
+    SOURCE = "source"
+    VOLUME = "volume"
+    INPUT_RESOLUTION = "input_resolution"
+    RECOMMENDED_RESOLUTION = "recommended_resolution"
+    ASPECT_RATIO = "aspect_ratio"
+    COLOR_TEMPERATURE = "color_temperature"
+    DYNAMIC_TONE_MAPPING = "dynamic_tone_mapping"
+    EBL = "ebl"
+    FAN_SPEED = "fan_speed"
+    GAMMA = "gamma"
+    LASER_LUMINANCE = "laser_luminance"
+    MOTION_ENHANCEMENT = "motion_enhancement"
+    PICTURE_MODE = "picture_mode"
+    SIGNAL_INFO = "signal_info"
+    TEMPERATURE = "temperature"
+
+
 MEDIA_PLAYER_STATE_MAPPING = {
     AwolValerionStates.ON: MediaPlayerStates.ON,
     AwolValerionStates.OFF: MediaPlayerStates.OFF,
@@ -100,4 +135,11 @@ REMOTE_STATE_MAPPING = {
     AwolValerionStates.OFF: RemoteStates.OFF,
     AwolValerionStates.UNAVAILABLE: RemoteStates.UNAVAILABLE,
     AwolValerionStates.UNKNOWN: RemoteStates.UNKNOWN,
+}
+
+SENSOR_STATE_MAPPING = {
+    AwolValerionStates.ON: SensorStates.ON,
+    AwolValerionStates.OFF: SensorStates.UNAVAILABLE,
+    AwolValerionStates.UNAVAILABLE: SensorStates.UNAVAILABLE,
+    AwolValerionStates.UNKNOWN: SensorStates.UNKNOWN,
 }

@@ -198,7 +198,7 @@ class AwolValerionDevice(PollingDevice):
 
     async def av_mute_toggle(self) -> bool:
         """Toggle the projector's audio and video output mute state."""
-        return await self._set_av_mute(not self.status.av_muted)
+        return await self._set_av_mute(not self.status.muted)
 
     async def cursor_up(self) -> bool:
         """Move the cursor up in the projector's OSD."""

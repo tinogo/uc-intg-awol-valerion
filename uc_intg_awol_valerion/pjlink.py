@@ -48,7 +48,7 @@ class PJLinkStatus:
 
     power: AwolValerionStates = AwolValerionStates.UNAVAILABLE
     reachable: bool = False
-    input_code: str | None = None
+    input_id: str | None = None
     input_list: dict[str, str] = field(
         default_factory=lambda: {
             "Home": "30",
@@ -57,8 +57,77 @@ class PJLinkStatus:
             "HDMI 3": "33",
         }
     )
-    av_muted: bool = False
+    muted: bool = False
     volume: int = 0
+    input_resolution: str | None = None
+    aspect_ratio_id: str | None = None
+    aspect_ratio_list: dict[str, str] = field(
+        default_factory=lambda: {
+            "Auto": "0",
+            "4:3": "1",
+            "Zoom": "2",
+            "16:9": "3",
+            "21:9": "4",
+            "32:9": "5",
+            "Anamorphic: 16:9": "6",
+            "Anamorphic: 2.39:1": "7",
+            "Anamorphic: 1.85:1": "8",
+            "Anamorphic: 2.0:1": "9",
+        }
+    )
+    color_temperature_id: str | None = None
+    color_temperature_list: dict[str, str] = field(
+        default_factory=lambda: {
+            "Warm 1": "0",
+            "Warm 2": "1",
+            "Standard": "2",
+            "Cool": "3",
+        }
+    )
+    dynamic_tone_mapping_id: str | None = None
+    dynamic_tone_mapping_list: dict[str, str] = field(
+        default_factory=lambda: {
+            "Off": "0",
+            "Low": "1",
+            "High": "2",
+        }
+    )
+    ebl_id: str | None = None
+    ebl_list: dict[str, str] = field(
+        default_factory=lambda: {
+            "Off": "0",
+            "Low": "1",
+            "Medium": "2",
+            "High": "3",
+        }
+    )
+    fan_speed: str | None = None
+    gamma_id: str | None = None
+    gamma_list: dict[str, str] = field(
+        default_factory=lambda: {
+            "2.0": "0",
+            "2.2": "1",
+            "2.4": "2",
+            "BT1886": "3",
+            "SMTP2084": "4",
+            "HLG": "5",
+        }
+    )
+    laser_luminance: str | None = None
+    motion_enhancement_id: str | None = None
+    motion_enhancement_list: dict[str, str] = field(
+        default_factory=lambda: {
+            "Off": "0",
+            "Custom": "1",
+            "Film": "2",
+            "Clear": "3",
+            "Standard": "4",
+            "Smooth": "5",
+        }
+    )
+    picture_mode: str | None = None
+    signal_info: str | None = None
+    temperature: str | None = None
 
     @property
     def source_list(self) -> list[str]:
@@ -67,13 +136,97 @@ class PJLinkStatus:
 
     @property
     def input(self) -> str | None:
-        """Return the current source."""
-        if self.input_code is None:
+        """Return the current pretty printed source."""
+        if self.input_id is None:
             return None
 
         try:
             return list(self.input_list.keys())[
-                list(self.input_list.values()).index(self.input_code)
+                list(self.input_list.values()).index(self.input_id)
+            ]
+        except ValueError:
+            return None
+
+    @property
+    def aspect_ratio(self) -> str | None:
+        """Return the current pretty printed aspect ratio."""
+        if self.aspect_ratio_id is None:
+            return None
+
+        try:
+            return list(self.aspect_ratio_list.keys())[
+                list(self.aspect_ratio_list.values()).index(self.aspect_ratio_id)
+            ]
+        except ValueError:
+            return None
+
+    @property
+    def color_temperature(self) -> str | None:
+        """Return the current pretty printed color temperature."""
+        if self.color_temperature_id is None:
+            return None
+
+        try:
+            return list(self.color_temperature_list.keys())[
+                list(self.color_temperature_list.values()).index(
+                    self.color_temperature_id
+                )
+            ]
+        except ValueError:
+            return None
+
+    @property
+    def ebl(self) -> str | None:
+        """Return the current pretty printed EBL mode."""
+        if self.ebl_id is None:
+            return None
+
+        try:
+            return list(self.ebl_list.keys())[
+                list(self.ebl_list.values()).index(self.ebl_id)
+            ]
+        except ValueError:
+            return None
+
+    @property
+    def dynamic_tone_mapping(self) -> str | None:
+        """Return the current pretty printed dynamic tone mapping mode."""
+        if self.dynamic_tone_mapping_id is None:
+            return None
+
+        try:
+            return list(self.dynamic_tone_mapping_list.keys())[
+                list(self.dynamic_tone_mapping_list.values()).index(
+                    self.dynamic_tone_mapping_id
+                )
+            ]
+        except ValueError:
+            return None
+
+    @property
+    def gamma(self) -> str | None:
+        """Return the current pretty printed Gamma mode."""
+        if self.gamma_id is None:
+            return None
+
+        try:
+            return list(self.gamma_list.keys())[
+                list(self.gamma_list.values()).index(self.gamma_id)
+            ]
+        except ValueError:
+            return None
+
+    @property
+    def motion_enhancement(self) -> str | None:
+        """Return the current pretty printed motion enhancement mode."""
+        if self.motion_enhancement_id is None:
+            return None
+
+        try:
+            return list(self.motion_enhancement_list.keys())[
+                list(self.motion_enhancement_list.values()).index(
+                    self.motion_enhancement_id
+                )
             ]
         except ValueError:
             return None
@@ -105,6 +258,14 @@ class PJLinkClient:
     def host(self) -> str:
         """Return the host address."""
         return self._host
+
+    async def _send_and_get_value(self, command: str) -> str | None:
+        """Send a command and get its value."""
+        response = await self._send(command)
+        value = self._value(response)
+        if self._is_err(value):
+            return None
+        return value
 
     async def _send(self, command: str) -> str:
         """Open a connection, (optionally) authenticate, send one command, read reply."""
@@ -164,32 +325,26 @@ class PJLinkClient:
     # -- high-level queries -------------------------------------------------
     async def test(self) -> bool:
         """Return True if the projector answers a power query (validates setup)."""
-        value = self._value(await self._send(AwolValerionCommands.GET_POWER))
-        return value is not None
+        return (
+            await self._send_and_get_value(AwolValerionCommands.GET_POWER) is not None
+        )
 
     async def get_power(self) -> AwolValerionStates:
         """Return the projector's current power state."""
-        value = self._value(await self._send(AwolValerionCommands.GET_POWER))
-        if self._is_err(value):
+        value = await self._send_and_get_value(AwolValerionCommands.GET_POWER)
+        if value is None:
             return AwolValerionStates.UNAVAILABLE
         return PJLINK_POWER.get(value, AwolValerionStates.UNAVAILABLE)
 
-    async def get_input(self) -> str | None:
-        """Return the projector's current input code (e.g. ``HDMI1``)."""
-        value = self._value(await self._send(AwolValerionCommands.GET_INPUT))
-        return None if self._is_err(value) else value
-
     async def get_mute(self) -> bool:
         """Return True if the projector's audio output is muted."""
-        value = self._value(await self._send(AwolValerionCommands.GET_AVMUTE))
-        if self._is_err(value):
-            return False
+        value = await self._send_and_get_value(AwolValerionCommands.GET_AVMUTE)
         return value in AVMUTE_MUTED
 
     async def get_volume(self) -> int:
         """Return the current volume of the projector."""
-        value = self._value(await self._send(AwolValerionCommands.GET_VOLUME))
-        if self._is_err(value) or value is None:
+        value = await self._send_and_get_value(AwolValerionCommands.GET_VOLUME)
+        if value is None:
             return 0
         return int(value)
 
@@ -210,9 +365,47 @@ class PJLinkClient:
             AwolValerionStates.UNKNOWN,
         ):
             try:
-                status.input_code = await self.get_input()
-                status.av_muted = await self.get_mute()
+                status.input_id = await self._send_and_get_value(
+                    AwolValerionCommands.GET_INPUT
+                )
+                status.muted = await self.get_mute()
                 status.volume = await self.get_volume()
+                status.input_resolution = await self._send_and_get_value(
+                    AwolValerionCommands.GET_INPUT_RESOLUTION
+                )
+                status.aspect_ratio_id = await self._send_and_get_value(
+                    AwolValerionCommands.GET_ASPECT_RATIO
+                )
+                status.color_temperature_id = await self._send_and_get_value(
+                    AwolValerionCommands.GET_COLOR_TEMPERATURE
+                )
+                status.dynamic_tone_mapping_id = await self._send_and_get_value(
+                    AwolValerionCommands.GET_DYNAMIC_TONE_MAPPING
+                )
+                status.ebl_id = await self._send_and_get_value(
+                    AwolValerionCommands.GET_EBL
+                )
+                status.fan_speed = await self._send_and_get_value(
+                    AwolValerionCommands.GET_FAN_SPEED
+                )
+                status.gamma_id = await self._send_and_get_value(
+                    AwolValerionCommands.GET_GAMMA
+                )
+                status.laser_luminance = await self._send_and_get_value(
+                    AwolValerionCommands.GET_LASER_LUMINANCE
+                )
+                status.motion_enhancement_id = await self._send_and_get_value(
+                    AwolValerionCommands.GET_MOTION_ENHANCEMENT
+                )
+                status.picture_mode = await self._send_and_get_value(
+                    AwolValerionCommands.GET_PICTURE_MODE
+                )
+                status.signal_info = await self._send_and_get_value(
+                    AwolValerionCommands.GET_SIGNAL_INFO
+                )
+                status.temperature = await self._send_and_get_value(
+                    AwolValerionCommands.GET_TEMPERATURE
+                )
             except (OSError, asyncio.TimeoutError, PJLinkError):
                 pass
         return status

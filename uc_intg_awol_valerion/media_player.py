@@ -156,6 +156,6 @@ class AwolValerionMediaPlayer(MediaPlayer, Entity):
                 MediaAttr.SOURCE: self._device.status.input,
                 MediaAttr.SOURCE_LIST: list(self._device.status.source_list),
                 MediaAttr.VOLUME: self._device.status.volume,
-                MediaAttr.MUTED: self._device.status.av_muted,
+                MediaAttr.MUTED: self._device.status.muted,
             }
         )

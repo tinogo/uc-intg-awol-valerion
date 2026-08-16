@@ -21,6 +21,7 @@ It also heavily borrows code from the [Epson projector integration](https://gith
 
 - [Media player](#media-player-entity)
 - [Remote](#remote-entity)
+- [Sensors](#sensor-entity)
 
 ### Media Player entity
 
@@ -49,6 +50,26 @@ The Media Player entity implements the following features:
 Furthermore, it implements many Simple-Commands.
 
 The commands `SEND_CMD` and `SEND_CMD_SEQUENCE` allow the user to send any supported PJLink-commands (see https://support.valerion.com/hc/en-us/articles/17088458288143-What-is-AWOL-Link for reference).
+
+### Sensor entity
+
+This integration provides the following sensors:
+- Current Volume
+- Muted Status
+- Current Source
+- Current input resolution
+- Recommended resolution
+- Current aspect ratio
+- Current color temperature mode
+- Current Dynamic tone mapping mode
+- Current EBL mode
+- Current Fan speed
+- Current Gamma mode
+- Current laser luminance level
+- Current motion enhancement mode
+- Current picture mode
+- Current signal info
+- Current temperatures of the projector
 
 ## Installation instructions
 
