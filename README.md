@@ -74,6 +74,7 @@ This integration provides the following sensors:
 ## Installation instructions
 
 1. Ensure that you've enabled the "AWOL Link" feature in your projector's settings (it requires the latest Q0718 firmware or later).
+   - **Important:** Leave the "security code" for the AWOL Link disabled, otherwise the integration won't work. Authentication needs to be figured out, still (see https://github.com/tinogo/uc-intg-awol-valerion/issues/11 for reference).
 2. Download the integration package (tar.gz file) from the [Releases](https://github.com/tinogo/uc-intg-awol-valerion/releases) page
 3. Upload the archive via the Remote's web configurator: "Integrations" → "Install custom"
 4. Configure your device through the setup wizard
