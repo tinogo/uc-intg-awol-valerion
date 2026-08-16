@@ -17,9 +17,9 @@ def get_simple_command_map(device: AwolValerionDevice) -> dict[str, Callable]:
     return {
         SimpleCommands.VOLUME_UP.value: device.volume_up,
         SimpleCommands.VOLUME_DOWN.value: device.volume_down,
-        SimpleCommands.MUTE_ON.value: device.av_mute_on,
-        SimpleCommands.MUTE_OFF.value: device.av_mute_off,
-        SimpleCommands.MUTE_TOGGLE.value: device.av_mute_toggle,
+        SimpleCommands.MUTE_ON.value: device.mute_on,
+        SimpleCommands.MUTE_OFF.value: device.mute_off,
+        SimpleCommands.MUTE_TOGGLE.value: device.mute_toggle,
         SimpleCommands.CURSOR_UP.value: device.cursor_up,
         SimpleCommands.CURSOR_DOWN.value: device.cursor_down,
         SimpleCommands.CURSOR_LEFT.value: device.cursor_left,

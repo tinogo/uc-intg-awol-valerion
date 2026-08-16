@@ -179,16 +179,16 @@ class AwolValerionDevice(PollingDevice):
             _LOG.error("[%s] Source select failed: %s", self.log_id, err)
             return False
 
-    async def av_mute_on(self) -> bool:
-        """Mute the projector's audio and video output."""
-        return await self._set_av_mute(True)
+    async def mute_on(self) -> bool:
+        """Mute the projector's audio output."""
+        return await self._set_mute(True)
 
-    async def av_mute_off(self) -> bool:
-        """Unmute the projector's audio and video output."""
-        return await self._set_av_mute(False)
+    async def mute_off(self) -> bool:
+        """Unmute the projector's audio output."""
+        return await self._set_mute(False)
 
-    async def _set_av_mute(self, muted: bool) -> bool:
-        """Set the AV mute state."""
+    async def _set_mute(self, muted: bool) -> bool:
+        """Set the mute state."""
         try:
             await self._client.set_mute(muted)
             return True
@@ -196,9 +196,9 @@ class AwolValerionDevice(PollingDevice):
             _LOG.error("[%s] AV-mute failed: %s", self.log_id, err)
             return False
 
-    async def av_mute_toggle(self) -> bool:
-        """Toggle the projector's audio and video output mute state."""
-        return await self._set_av_mute(not self.status.muted)
+    async def mute_toggle(self) -> bool:
+        """Toggle the projector's audio output mute state."""
+        return await self._set_mute(not self.status.muted)
 
     async def cursor_up(self) -> bool:
         """Move the cursor up in the projector's OSD."""
