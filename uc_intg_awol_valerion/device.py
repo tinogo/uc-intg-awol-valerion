@@ -142,6 +142,7 @@ class AwolValerionDevice(PollingDevice):
 
         try:
             await self._client.power_on()
+            await self.poll_device()
             return True
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.info("[%s] power-on failed: %s", self.log_id, err)
@@ -154,6 +155,7 @@ class AwolValerionDevice(PollingDevice):
 
         try:
             await self._client.power_off()
+            await self.poll_device()
             return True
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.info("[%s] power-off failed: %s", self.log_id, err)
@@ -173,6 +175,7 @@ class AwolValerionDevice(PollingDevice):
 
         try:
             if await self._client.select_input(source):
+                await self.poll_device()
                 return True
             return False
         except Exception as err:  # pylint: disable=broad-exception-caught
@@ -191,6 +194,7 @@ class AwolValerionDevice(PollingDevice):
         """Set the mute state."""
         try:
             await self._client.set_mute(muted)
+            await self.poll_device()
             return True
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.error("[%s] AV-mute failed: %s", self.log_id, err)
@@ -256,6 +260,7 @@ class AwolValerionDevice(PollingDevice):
         """Send a raw PJLink command string (e.g. ``%1INPT 32``)."""
         try:
             await self._client.send_raw(command)
+            await self.poll_device()
             return True
         except Exception as err:  # pylint: disable=broad-exception-caught
             _LOG.error("[%s] Raw command '%s' failed: %s", self.log_id, command, err)
