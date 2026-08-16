@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.3.0...v0.4.0) (2026-08-16)
+
+
+### Features
+
+* Add select entity support ([#14](https://github.com/tinogo/uc-intg-awol-valerion/issues/14)) ([bbb4092](https://github.com/tinogo/uc-intg-awol-valerion/commit/bbb4092e15e167fefba8de6ccefaf983ae44f280))
+
+
+### Documentation
+
+* extend the README with the supported Select Entities ([eb5c24b](https://github.com/tinogo/uc-intg-awol-valerion/commit/eb5c24bf7730699d67e1921e272d217663cb8f8e))
+
 ## [0.3.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.2.0...v0.3.0) (2026-08-16)
 
 
