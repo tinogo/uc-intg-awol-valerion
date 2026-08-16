@@ -53,6 +53,14 @@ class AwolValerionSelect(Select, Entity):
             SelectType.MOTION_ENHANCEMENT: self._get_motion_enhancement_select_attributes,
             SelectType.PICTURE_MODE: self._get_picture_mode_select_attributes,
         }
+        self._select_command_template_map: dict[SelectType, str] = {
+            SelectType.COLOR_TEMPERATURE: AwolValerionCommands.SET_COLOR_TEMPERATURE,
+            SelectType.DYNAMIC_TONE_MAPPING: AwolValerionCommands.SET_DYNAMIC_TONE_MAPPING,
+            SelectType.EBL: AwolValerionCommands.SET_EBL,
+            SelectType.GAMMA: AwolValerionCommands.SET_GAMMA,
+            SelectType.MOTION_ENHANCEMENT: AwolValerionCommands.SET_MOTION_ENHANCEMENT,
+            SelectType.PICTURE_MODE: AwolValerionCommands.SET_PICTURE_MODE,
+        }
 
         select_config = self._get_select_config(select_type, device)
 
@@ -105,410 +113,52 @@ class AwolValerionSelect(Select, Entity):
             params if params else "",
         )
 
-        match self._select_type:
-            case SelectType.COLOR_TEMPERATURE:
-                return await self._handle_color_temperature_command(cmd_id, params)
+        command_template = self._select_command_template_map.get(self._select_type)
+        if command_template is None:
+            raise ValueError(f"Unsupported select type: {self._select_type}")
 
-            case SelectType.DYNAMIC_TONE_MAPPING:
-                return await self._handle_dynamic_tone_mapping_command(cmd_id, params)
+        return await self._handle_select_command(cmd_id, params, command_template)
 
-            case SelectType.EBL:
-                return await self._handle_ebl_command(cmd_id, params)
-
-            case SelectType.GAMMA:
-                return await self._handle_gamma_command(cmd_id, params)
-
-            case SelectType.MOTION_ENHANCEMENT:
-                return await self._handle_motion_enhancement_command(cmd_id, params)
-
-            case SelectType.PICTURE_MODE:
-                return await self._handle_picture_mode_command(cmd_id, params)
-
-    async def _handle_color_temperature_command(
-        self, cmd_id: str, params: dict[str, Any] | None
+    async def _handle_select_command(  # pylint: disable=too-many-branches
+        self, cmd_id: str, params: dict[str, Any] | None, command_template: str
     ) -> Literal[StatusCodes.OK]:
-        color_temperature_list = list(self._device.status.color_temperature_list.keys())
+        attributes = self._entity_attribute_map[self._select_type]()
+        options = list(attributes.get(SelectAttr.OPTIONS, []))
+        current_option = attributes.get(SelectAttr.CURRENT_OPTION)
+        cycle = bool(params.get("cycle")) if params is not None else False
+
+        target_option = None
+
         match cmd_id:
             case SelectCommands.SELECT_OPTION:
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_COLOR_TEMPERATURE.format(params["option"])
-                )
+                target_option = params.get("option") if params is not None else None
 
             case SelectCommands.SELECT_FIRST:
-                first_color_temperature_name = color_temperature_list[0]
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_COLOR_TEMPERATURE.format(
-                        first_color_temperature_name
-                    )
-                )
+                if options:
+                    target_option = options[0]
 
             case SelectCommands.SELECT_LAST:
-                last_color_temperature_name = color_temperature_list[-1]
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_COLOR_TEMPERATURE.format(
-                        last_color_temperature_name
-                    )
-                )
+                if options:
+                    target_option = options[-1]
 
             case SelectCommands.SELECT_NEXT:
-                current_index = color_temperature_list.index(
-                    self._device.status.color_temperature
-                )
-                if current_index < len(color_temperature_list) - 1:
-                    next_color_temperature_name = color_temperature_list[
-                        current_index + 1
-                    ]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_COLOR_TEMPERATURE.format(
-                            next_color_temperature_name
-                        )
-                    )
-                elif params["cycle"]:
-                    next_color_temperature_name = color_temperature_list[0]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_COLOR_TEMPERATURE.format(
-                            next_color_temperature_name
-                        )
-                    )
+                if current_option in options:
+                    current_index = options.index(current_option)
+                    if current_index < len(options) - 1:
+                        target_option = options[current_index + 1]
+                    elif cycle and options:
+                        target_option = options[0]
 
             case SelectCommands.SELECT_PREVIOUS:
-                current_index = color_temperature_list.index(
-                    self._device.status.color_temperature
-                )
-                if current_index > 0:
-                    previous_color_temperature_name = color_temperature_list[
-                        current_index - 1
-                    ]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_COLOR_TEMPERATURE.format(
-                            previous_color_temperature_name
-                        )
-                    )
-                elif params["cycle"]:
-                    previous_color_temperature_name = color_temperature_list[
-                        len(color_temperature_list)
-                    ]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_COLOR_TEMPERATURE.format(
-                            previous_color_temperature_name
-                        )
-                    )
+                if current_option in options:
+                    current_index = options.index(current_option)
+                    if current_index > 0:
+                        target_option = options[current_index - 1]
+                    elif cycle and options:
+                        target_option = options[-1]
 
-        return StatusCodes.OK
-
-    async def _handle_dynamic_tone_mapping_command(
-        self, cmd_id: str, params: dict[str, Any] | None
-    ) -> Literal[StatusCodes.OK]:
-        dynamic_tone_mapping_list = list(
-            self._device.status.dynamic_tone_mapping_list.keys()
-        )
-        match cmd_id:
-            case SelectCommands.SELECT_OPTION:
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_DYNAMIC_TONE_MAPPING.format(
-                        params["option"]
-                    )
-                )
-
-            case SelectCommands.SELECT_FIRST:
-                first_dynamic_tone_mapping_name = dynamic_tone_mapping_list[0]
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_DYNAMIC_TONE_MAPPING.format(
-                        first_dynamic_tone_mapping_name
-                    )
-                )
-
-            case SelectCommands.SELECT_LAST:
-                last_dynamic_tone_mapping_name = dynamic_tone_mapping_list[-1]
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_DYNAMIC_TONE_MAPPING.format(
-                        last_dynamic_tone_mapping_name
-                    )
-                )
-
-            case SelectCommands.SELECT_NEXT:
-                current_index = dynamic_tone_mapping_list.index(
-                    self._device.status.dynamic_tone_mapping
-                )
-                if current_index < len(dynamic_tone_mapping_list) - 1:
-                    next_dynamic_tone_mapping_name = dynamic_tone_mapping_list[
-                        current_index + 1
-                    ]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_DYNAMIC_TONE_MAPPING.format(
-                            next_dynamic_tone_mapping_name
-                        )
-                    )
-                elif params["cycle"]:
-                    next_dynamic_tone_mapping_name = dynamic_tone_mapping_list[0]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_DYNAMIC_TONE_MAPPING.format(
-                            next_dynamic_tone_mapping_name
-                        )
-                    )
-
-            case SelectCommands.SELECT_PREVIOUS:
-                current_index = dynamic_tone_mapping_list.index(
-                    self._device.status.dynamic_tone_mapping
-                )
-                if current_index > 0:
-                    previous_dynamic_tone_mapping_name = dynamic_tone_mapping_list[
-                        current_index - 1
-                    ]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_DYNAMIC_TONE_MAPPING.format(
-                            previous_dynamic_tone_mapping_name
-                        )
-                    )
-                elif params["cycle"]:
-                    previous_dynamic_tone_mapping_name = dynamic_tone_mapping_list[
-                        len(dynamic_tone_mapping_list)
-                    ]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_DYNAMIC_TONE_MAPPING.format(
-                            previous_dynamic_tone_mapping_name
-                        )
-                    )
-
-        return StatusCodes.OK
-
-    async def _handle_ebl_command(
-        self, cmd_id: str, params: dict[str, Any] | None
-    ) -> Literal[StatusCodes.OK]:
-        ebl_list = list(self._device.status.ebl_list.keys())
-        match cmd_id:
-            case SelectCommands.SELECT_OPTION:
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_EBL.format(params["option"])
-                )
-
-            case SelectCommands.SELECT_FIRST:
-                first_ebl_name = ebl_list[0]
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_EBL.format(first_ebl_name)
-                )
-
-            case SelectCommands.SELECT_LAST:
-                last_ebl_name = ebl_list[-1]
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_EBL.format(last_ebl_name)
-                )
-
-            case SelectCommands.SELECT_NEXT:
-                current_index = ebl_list.index(self._device.status.ebl)
-                if current_index < len(ebl_list) - 1:
-                    next_ebl_name = ebl_list[current_index + 1]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_EBL.format(next_ebl_name)
-                    )
-                elif params["cycle"]:
-                    next_ebl_name = ebl_list[0]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_EBL.format(next_ebl_name)
-                    )
-
-            case SelectCommands.SELECT_PREVIOUS:
-                current_index = ebl_list.index(self._device.status.ebl)
-                if current_index > 0:
-                    previous_ebl_name = ebl_list[current_index - 1]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_EBL.format(previous_ebl_name)
-                    )
-                elif params["cycle"]:
-                    previous_ebl_name = ebl_list[len(ebl_list)]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_EBL.format(previous_ebl_name)
-                    )
-
-        return StatusCodes.OK
-
-    async def _handle_gamma_command(
-        self, cmd_id: str, params: dict[str, Any] | None
-    ) -> Literal[StatusCodes.OK]:
-        gamma_list = list(self._device.status.gamma_list.keys())
-        match cmd_id:
-            case SelectCommands.SELECT_OPTION:
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_GAMMA.format(params["option"])
-                )
-
-            case SelectCommands.SELECT_FIRST:
-                first_gamma_name = gamma_list[0]
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_GAMMA.format(first_gamma_name)
-                )
-
-            case SelectCommands.SELECT_LAST:
-                last_gamma_name = gamma_list[-1]
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_GAMMA.format(last_gamma_name)
-                )
-
-            case SelectCommands.SELECT_NEXT:
-                current_index = gamma_list.index(self._device.status.gamma)
-                if current_index < len(gamma_list) - 1:
-                    next_gamma_name = gamma_list[current_index + 1]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_GAMMA.format(next_gamma_name)
-                    )
-                elif params["cycle"]:
-                    next_gamma_name = gamma_list[0]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_GAMMA.format(next_gamma_name)
-                    )
-
-            case SelectCommands.SELECT_PREVIOUS:
-                current_index = gamma_list.index(self._device.status.gamma)
-                if current_index > 0:
-                    previous_gamma_name = gamma_list[current_index - 1]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_GAMMA.format(previous_gamma_name)
-                    )
-                elif params["cycle"]:
-                    previous_gamma_name = gamma_list[len(gamma_list)]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_GAMMA.format(previous_gamma_name)
-                    )
-
-        return StatusCodes.OK
-
-    async def _handle_motion_enhancement_command(
-        self, cmd_id: str, params: dict[str, Any] | None
-    ) -> Literal[StatusCodes.OK]:
-        motion_enhancement_list = list(
-            self._device.status.motion_enhancement_list.keys()
-        )
-        match cmd_id:
-            case SelectCommands.SELECT_OPTION:
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_MOTION_ENHANCEMENT.format(params["option"])
-                )
-
-            case SelectCommands.SELECT_FIRST:
-                first_motion_enhancement_name = motion_enhancement_list[0]
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_MOTION_ENHANCEMENT.format(
-                        first_motion_enhancement_name
-                    )
-                )
-
-            case SelectCommands.SELECT_LAST:
-                last_motion_enhancement_name = motion_enhancement_list[-1]
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_MOTION_ENHANCEMENT.format(
-                        last_motion_enhancement_name
-                    )
-                )
-
-            case SelectCommands.SELECT_NEXT:
-                current_index = motion_enhancement_list.index(
-                    self._device.status.motion_enhancement
-                )
-                if current_index < len(motion_enhancement_list) - 1:
-                    next_motion_enhancement_name = motion_enhancement_list[
-                        current_index + 1
-                    ]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_MOTION_ENHANCEMENT.format(
-                            next_motion_enhancement_name
-                        )
-                    )
-                elif params["cycle"]:
-                    next_motion_enhancement_name = motion_enhancement_list[0]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_MOTION_ENHANCEMENT.format(
-                            next_motion_enhancement_name
-                        )
-                    )
-
-            case SelectCommands.SELECT_PREVIOUS:
-                current_index = motion_enhancement_list.index(
-                    self._device.status.motion_enhancement
-                )
-                if current_index > 0:
-                    previous_motion_enhancement_name = motion_enhancement_list[
-                        current_index - 1
-                    ]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_MOTION_ENHANCEMENT.format(
-                            previous_motion_enhancement_name
-                        )
-                    )
-                elif params["cycle"]:
-                    previous_motion_enhancement_name = motion_enhancement_list[
-                        len(motion_enhancement_list)
-                    ]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_MOTION_ENHANCEMENT.format(
-                            previous_motion_enhancement_name
-                        )
-                    )
-
-        return StatusCodes.OK
-
-    async def _handle_picture_mode_command(
-        self, cmd_id: str, params: dict[str, Any] | None
-    ) -> Literal[StatusCodes.OK]:
-        picture_mode_list = self._device.status.picture_mode_list
-        match cmd_id:
-            case SelectCommands.SELECT_OPTION:
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_PICTURE_MODE.format(params["option"])
-                )
-
-            case SelectCommands.SELECT_FIRST:
-                first_picture_mode_name = picture_mode_list[0]
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_PICTURE_MODE.format(
-                        first_picture_mode_name
-                    )
-                )
-
-            case SelectCommands.SELECT_LAST:
-                last_picture_mode_name = picture_mode_list[-1]
-                await self._device.send_raw(
-                    AwolValerionCommands.SET_PICTURE_MODE.format(last_picture_mode_name)
-                )
-
-            case SelectCommands.SELECT_NEXT:
-                current_index = picture_mode_list.index(
-                    self._device.status.picture_mode
-                )
-                if current_index < len(picture_mode_list) - 1:
-                    next_picture_mode_name = picture_mode_list[current_index + 1]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_PICTURE_MODE.format(
-                            next_picture_mode_name
-                        )
-                    )
-                elif params["cycle"]:
-                    next_picture_mode_name = picture_mode_list[0]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_PICTURE_MODE.format(
-                            next_picture_mode_name
-                        )
-                    )
-
-            case SelectCommands.SELECT_PREVIOUS:
-                current_index = picture_mode_list.index(
-                    self._device.status.picture_mode
-                )
-                if current_index > 0:
-                    previous_picture_mode_name = picture_mode_list[current_index - 1]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_PICTURE_MODE.format(
-                            previous_picture_mode_name
-                        )
-                    )
-                elif params["cycle"]:
-                    previous_picture_mode_name = picture_mode_list[
-                        len(picture_mode_list)
-                    ]
-                    await self._device.send_raw(
-                        AwolValerionCommands.SET_PICTURE_MODE.format(
-                            previous_picture_mode_name
-                        )
-                    )
+        if target_option is not None:
+            await self._device.send_raw(command_template.format(target_option))
 
         return StatusCodes.OK
 
