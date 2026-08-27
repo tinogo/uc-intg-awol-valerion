@@ -343,16 +343,25 @@ class PJLinkClient:
                     .decode("utf-8", errors="replace")
                     .strip()
                 )
+
                 payload = command
                 if greeting.startswith("PJLINK 1"):
                     parts = greeting.split(" ")
                     if len(parts) < 3:
                         raise PJLinkError("Malformed authentication challenge")
                     seed = parts[2].strip()
+
                     digest = hashlib.md5(
                         (self._password + seed).encode("utf-8")
                     ).hexdigest()
-                    payload = f"{digest}{command}"
+
+                    writer.write(f"{digest}\r".encode("utf-8"))
+                    await writer.drain()
+                    raw = await asyncio.wait_for(reader.read(256), timeout=_TIMEOUT)
+                    response = raw.decode("utf-8", errors="replace").strip()
+
+                    if "PJLINK ERRA" in response:
+                        raise PJLinkAuthError("Invalid PJLink password")
                 elif greeting.startswith("PJLINK ERRA"):
                     raise PJLinkAuthError("Authentication required")
 
