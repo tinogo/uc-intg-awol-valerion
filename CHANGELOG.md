@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.5.0...v0.5.1) (2026-08-27)
+
+
+### Bug Fixes
+
+* **#11:** fix the authentication ([8e5df89](https://github.com/tinogo/uc-intg-awol-valerion/commit/8e5df896ce8e55a3a387be30f763980c1b90186b)), closes [#11](https://github.com/tinogo/uc-intg-awol-valerion/issues/11)
+
 ## [0.5.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.4.0...v0.5.0) (2026-08-16)
 
 
