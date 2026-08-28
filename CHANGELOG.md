@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.1](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.0.0...v1.0.1) (2026-08-28)
+
+
+### Bug Fixes
+
+* let the integration setup fail when the authentication fails ([a833ca7](https://github.com/tinogo/uc-intg-awol-valerion/commit/a833ca72c77a1fd1de75f25f9db36d84015d5da5))
+
+
+### Miscellaneous
+
+* Enforce immutable releases ([b35ac20](https://github.com/tinogo/uc-intg-awol-valerion/commit/b35ac20e7ae63ad283153b8cdc1f9ea2a8751757))
+
 ## [1.0.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.6.0...v1.0.0) (2026-08-28)
 
 
