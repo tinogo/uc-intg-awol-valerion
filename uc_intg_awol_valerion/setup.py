@@ -88,7 +88,7 @@ class AwolValerionSetupFlow(BaseSetupFlow[AwolValerionConfig]):
         """
         return _MANUAL_INPUT_SCHEMA
 
-    async def query_device(
+    async def query_device(  # pylint: disable=too-many-return-statements
         self, input_values: dict[str, Any]
     ) -> AwolValerionConfig | SetupError | RequestUserInput:
         """
@@ -138,6 +138,10 @@ class AwolValerionSetupFlow(BaseSetupFlow[AwolValerionConfig]):
 
             return config
 
+        except PJLinkAuthError:
+            _LOG.error("Connection to %s requires a valid password.", address)
+            return SetupError(IntegrationSetupError.AUTHORIZATION_ERROR)
+
         except ConnectionError as ex:
             _LOG.error("Connection refused to %s: %s", address, ex)
             return SetupError(IntegrationSetupError.CONNECTION_REFUSED)
@@ -156,11 +160,7 @@ class AwolValerionSetupFlow(BaseSetupFlow[AwolValerionConfig]):
     ) -> PJLinkIdentity | None:
         """Try to connect to the projector; return identity or empty."""
         client = PJLinkClient(config.address, config.port, config.password)
-        try:
-            if await client.test():
-                identity = await client.get_identity()
-                return identity
-        except PJLinkAuthError:
-            _LOG.warning("%s needs a password; completing anyway", config.address)
-        except Exception as err:  # pylint: disable=broad-exception-caught
-            _LOG.debug("Probe failed for %s: %s", config.address, err)
+
+        if await client.test():
+            return await client.get_identity()
+        return None
