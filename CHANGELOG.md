@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.0.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.6.0...v1.0.0) (2026-08-28)
+
+
+### Miscellaneous
+
+* **deps:** update the ucapi-framework ([112c851](https://github.com/tinogo/uc-intg-awol-valerion/commit/112c851cb77b13eb386b0b826423be9d7e0ccc28))
+* **docs:** document on how to update a single package ([8d81c05](https://github.com/tinogo/uc-intg-awol-valerion/commit/8d81c05c1ea4be3bbca64a7142f265897350d560))
+* move some code around ([e39c7b9](https://github.com/tinogo/uc-intg-awol-valerion/commit/e39c7b9d7bdfbb977b8626e3acc219f1af4b05dc))
+* reduce the code duplication in the Select entity ([be6ca4c](https://github.com/tinogo/uc-intg-awol-valerion/commit/be6ca4cb4e6a6326d7dafd7e5f3f067d57aa65a0))
+* reduce the code duplication in the Sensor entity ([657db7b](https://github.com/tinogo/uc-intg-awol-valerion/commit/657db7bc522d90cd179d3908bcf4283fe4bc8057))
+* release 1.0.0 ([10ac17a](https://github.com/tinogo/uc-intg-awol-valerion/commit/10ac17ac52eef858db0b651f312c3b649d204646))
+* treat every entity type to be self-contained ([b7a3518](https://github.com/tinogo/uc-intg-awol-valerion/commit/b7a351818480732477a8d12172857c5e0e8d95cc))
+
 ## [0.6.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.5.1...v0.6.0) (2026-08-28)
 
 
