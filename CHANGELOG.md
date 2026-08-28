@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.6.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.5.1...v0.6.0) (2026-08-28)
+
+
+### Features
+
+* add the Laser luminance select entity ([9a3f8ca](https://github.com/tinogo/uc-intg-awol-valerion/commit/9a3f8ca084a3b0f0ab519ebfbfaf6332bc7b8166))
+* fetch the picture mode list dynamically ([bf4400c](https://github.com/tinogo/uc-intg-awol-valerion/commit/bf4400c738dbc4f62cc8f28b9cab953afa55c765))
+
+
+### Documentation
+
+* update the readme ([6866202](https://github.com/tinogo/uc-intg-awol-valerion/commit/6866202edbb0d53779fdf8f262d53c0b877516f1))
+
+
+### Miscellaneous
+
+* poll every 5 seconds instead of 30 seconds ([c480ff7](https://github.com/tinogo/uc-intg-awol-valerion/commit/c480ff7f4047578817a17521e0cc006247f247bf))
+
 ## [0.5.1](https://github.com/tinogo/uc-intg-awol-valerion/compare/v0.5.0...v0.5.1) (2026-08-27)
 
 
