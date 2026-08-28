@@ -82,6 +82,7 @@ class AwolValerionCommands(StrEnum):
     GET_MOTION_ENHANCEMENT = "%3MOTN ?"
     GET_REC_RESOLUTION = "%2RRES ?"
     GET_PICTURE_MODE = "%3PICT ?"
+    GET_PICTURE_MODE_LIST = "%3PICL ?"
     GET_SIGNAL_INFO = "%3SINF ?"
     GET_TEMPERATURE = "%3TEMP ?"
     GET_VOLUME = "%3VOLM ?"

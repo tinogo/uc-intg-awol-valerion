@@ -126,32 +126,7 @@ class PJLinkStatus:
         }
     )
     picture_mode: str | None = None
-    picture_mode_list: list[str] = field(
-        default_factory=lambda: [
-            "Standard",
-            "Vivid",
-            "Sports",
-            "Energy Saving",
-            "PC/Game",
-            "Theater",
-            "FILMMAKER MODE",
-            "HDR Standard",
-            "HDR Vivid",
-            "HDR Sports",
-            "HDR Energy Saving",
-            "HDR Game",
-            "HDR Theater",
-            "IMAX Mode",
-            "HDR10+ Standard",
-            "HDR10+ Vivid",
-            "HDR10+ Game",
-            "HDR10+ Theater",
-            "Dolby Vision Bright",
-            "Dolby Vision Dark",
-            "Dolby Vision Custom",
-            "Dolby Vision Game",
-        ]
-    )
+    picture_mode_list: list[str] = field(default_factory=lambda: [])
     signal_info: str | None = None
     temperature: str | None = None
 
@@ -479,6 +454,7 @@ class PJLinkClient:
                 status.temperature = await self._send_and_get_value(
                     AwolValerionCommands.GET_TEMPERATURE
                 )
+                status.picture_mode_list = await self._get_picture_mode_list()
             except (OSError, asyncio.TimeoutError, PJLinkError):
                 pass
         return status
@@ -488,8 +464,8 @@ class PJLinkClient:
         identity = PJLinkIdentity()
 
         async def _q(command: str) -> str:
-            value = self._value(await self._send(command))
-            return "" if self._is_err(value) else value
+            value = await self._send_and_get_value(command)
+            return "" if value is None else value
 
         identity.name = await _q(AwolValerionCommands.GET_NAME)
         identity.manufacturer = await _q(AwolValerionCommands.GET_MANUFACTURER)
@@ -520,6 +496,16 @@ class PJLinkClient:
             if muted
             else AwolValerionCommands.SET_MUTE_OFF
         )
+
+    async def _get_picture_mode_list(self) -> list[str]:
+        picture_modes = await self._send_and_get_value(
+            AwolValerionCommands.GET_PICTURE_MODE_LIST
+        )
+
+        if picture_modes is not None:
+            return picture_modes.split(",")
+
+        return []
 
     async def send_raw(self, command: str) -> str:
         """Send a raw PJLink command string (e.g. ``%1INPT 32``)."""
