@@ -52,8 +52,8 @@ class AwolValerionDevice(PollingDevice):
         )
         self.status = PJLinkStatus()
         self.identity = PJLinkIdentity()
-        self._color_mode: str | None = None
         self._identity_loaded = False
+        self._poll_interval = 5
         self._fail_count = 0
 
     @property
