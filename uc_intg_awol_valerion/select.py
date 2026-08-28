@@ -1,3 +1,5 @@
+# pylint: disable=duplicate-code
+
 """
 Select Entity.
 
@@ -15,7 +17,6 @@ from ucapi.select import States
 from ucapi_framework import Entity, create_entity_id
 
 from uc_intg_awol_valerion.const import (
-    SELECT_STATE_MAPPING,
     AwolValerionCommands,
     AwolValerionStates,
     Loggers,
@@ -24,6 +25,13 @@ from uc_intg_awol_valerion.const import (
 from uc_intg_awol_valerion.device import AwolValerionDevice
 
 _LOG = logging.getLogger(Loggers.SELECT)
+
+_SELECT_STATE_MAPPING = {
+    AwolValerionStates.ON: States.ON,
+    AwolValerionStates.OFF: States.UNAVAILABLE,
+    AwolValerionStates.UNAVAILABLE: States.UNAVAILABLE,
+    AwolValerionStates.UNKNOWN: States.UNKNOWN,
+}
 
 
 @dataclass(frozen=True)
@@ -165,7 +173,7 @@ class AwolValerionSelect(Select, Entity):
     def _get_select_attributes(self) -> dict[str, Any]:
         """Build UC API attributes from the active select config."""
         return {
-            SelectAttr.STATE: SELECT_STATE_MAPPING[self._device.state],
+            SelectAttr.STATE: _SELECT_STATE_MAPPING[self._device.state],
             SelectAttr.CURRENT_OPTION: self._select_config.get_current_option(
                 self._device
             ),
@@ -225,7 +233,7 @@ class AwolValerionSelect(Select, Entity):
 
     def map_entity_states(self, device_state: AwolValerionStates) -> States:
         """Convert a device-specific state to a UC API entity state."""
-        return SELECT_STATE_MAPPING[device_state]
+        return _SELECT_STATE_MAPPING[device_state]
 
     async def sync_state(self) -> None:
         """Update the select attributes."""

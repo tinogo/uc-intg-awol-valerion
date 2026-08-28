@@ -17,7 +17,6 @@ from ucapi_framework import Entity, create_entity_id
 
 from uc_intg_awol_valerion.config import AwolValerionConfig
 from uc_intg_awol_valerion.const import (
-    REMOTE_STATE_MAPPING,
     AwolValerionStates,
     Loggers,
     SimpleCommands,
@@ -27,11 +26,12 @@ from uc_intg_awol_valerion.simple_commands import get_simple_command_map
 
 _LOG = logging.getLogger(Loggers.REMOTE)
 
-FEATURES = [
-    remote.Features.ON_OFF,
-    remote.Features.SEND_CMD,
-    remote.Features.TOGGLE,
-]
+_REMOTE_STATE_MAPPING = {
+    AwolValerionStates.ON: States.ON,
+    AwolValerionStates.OFF: States.OFF,
+    AwolValerionStates.UNAVAILABLE: States.UNAVAILABLE,
+    AwolValerionStates.UNKNOWN: States.UNKNOWN,
+}
 
 
 class AwolValerionRemote(Remote, Entity):
@@ -61,7 +61,11 @@ class AwolValerionRemote(Remote, Entity):
         super().__init__(
             identifier=entity_id,
             name=f"{device_config.name} Remote",
-            features=FEATURES,
+            features=[
+                remote.Features.ON_OFF,
+                remote.Features.SEND_CMD,
+                remote.Features.TOGGLE,
+            ],
             attributes=device.get_device_attributes(entity_id),
             simple_commands=[member.value for member in SimpleCommands],
             cmd_handler=self.handle_command,
@@ -145,12 +149,12 @@ class AwolValerionRemote(Remote, Entity):
 
     def map_entity_states(self, device_state: AwolValerionStates) -> States:
         """Convert a device-specific state to a UC API entity state."""
-        return REMOTE_STATE_MAPPING[device_state]
+        return _REMOTE_STATE_MAPPING[device_state]
 
     async def sync_state(self) -> None:
         """Update the remote attributes."""
         self.update(
             {
-                RemoteAttr.STATE: REMOTE_STATE_MAPPING[self._device.state],
+                RemoteAttr.STATE: _REMOTE_STATE_MAPPING[self._device.state],
             }
         )

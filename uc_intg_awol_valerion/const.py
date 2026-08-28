@@ -8,11 +8,6 @@ This module contains constants used throughout the integration.
 
 from enum import StrEnum
 
-from ucapi.media_player import States as MediaPlayerStates
-from ucapi.remote import States as RemoteStates
-from ucapi.select import States as SelectStates
-from ucapi.sensor import States as SensorStates
-
 
 class Loggers(StrEnum):
     """Defines the various logger types."""
@@ -143,32 +138,3 @@ class SensorType(StrEnum):
     PICTURE_MODE = "picture_mode"
     SIGNAL_INFO = "signal_info"
     TEMPERATURE = "temperature"
-
-
-MEDIA_PLAYER_STATE_MAPPING = {
-    AwolValerionStates.ON: MediaPlayerStates.ON,
-    AwolValerionStates.OFF: MediaPlayerStates.OFF,
-    AwolValerionStates.UNAVAILABLE: MediaPlayerStates.UNAVAILABLE,
-    AwolValerionStates.UNKNOWN: MediaPlayerStates.UNKNOWN,
-}
-
-REMOTE_STATE_MAPPING = {
-    AwolValerionStates.ON: RemoteStates.ON,
-    AwolValerionStates.OFF: RemoteStates.OFF,
-    AwolValerionStates.UNAVAILABLE: RemoteStates.UNAVAILABLE,
-    AwolValerionStates.UNKNOWN: RemoteStates.UNKNOWN,
-}
-
-SELECT_STATE_MAPPING = {
-    AwolValerionStates.ON: SelectStates.ON,
-    AwolValerionStates.OFF: SelectStates.UNAVAILABLE,
-    AwolValerionStates.UNAVAILABLE: SelectStates.UNAVAILABLE,
-    AwolValerionStates.UNKNOWN: SelectStates.UNKNOWN,
-}
-
-SENSOR_STATE_MAPPING = {
-    AwolValerionStates.ON: SensorStates.ON,
-    AwolValerionStates.OFF: SensorStates.UNAVAILABLE,
-    AwolValerionStates.UNAVAILABLE: SensorStates.UNAVAILABLE,
-    AwolValerionStates.UNKNOWN: SensorStates.UNKNOWN,
-}

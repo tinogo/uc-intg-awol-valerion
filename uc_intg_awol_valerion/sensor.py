@@ -1,3 +1,5 @@
+# pylint: disable=duplicate-code
+
 """
 Sensor Entity.
 
@@ -14,13 +16,20 @@ from ucapi.sensor import DeviceClasses, States
 from ucapi_framework import Entity, create_entity_id
 
 from uc_intg_awol_valerion.const import (
-    SENSOR_STATE_MAPPING,
+    AwolValerionStates,
     Loggers,
     SensorType,
 )
 from uc_intg_awol_valerion.device import AwolValerionDevice
 
 _LOG = logging.getLogger(Loggers.SENSOR)
+
+_SENSOR_STATE_MAPPING = {
+    AwolValerionStates.ON: States.ON,
+    AwolValerionStates.OFF: States.UNAVAILABLE,
+    AwolValerionStates.UNAVAILABLE: States.UNAVAILABLE,
+    AwolValerionStates.UNKNOWN: States.UNKNOWN,
+}
 
 
 @dataclass(frozen=True)
@@ -162,9 +171,9 @@ class AwolValerionSensor(Sensor, Entity):  # pylint: disable=too-few-public-meth
             "sensor_config": config,
         }
 
-    def map_entity_states(self, device_state: AwolValerionDevice) -> States:
+    def map_entity_states(self, device_state: AwolValerionStates) -> States:
         """Convert a device-specific state to a UC API entity state."""
-        return SENSOR_STATE_MAPPING[device_state]
+        return _SENSOR_STATE_MAPPING[device_state]
 
     async def sync_state(self) -> None:
         """Update the sensor attributes."""
@@ -173,7 +182,7 @@ class AwolValerionSensor(Sensor, Entity):  # pylint: disable=too-few-public-meth
     def _get_sensor_attributes(self) -> dict[str, Any]:
         """Build UC API attributes from the active sensor config."""
         attributes = {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
+            SensorAttr.STATE: _SENSOR_STATE_MAPPING[self._device.state],
             SensorAttr.VALUE: self._sensor_config.value_getter(self._device),
         }
         if self._sensor_config.unit is not None:

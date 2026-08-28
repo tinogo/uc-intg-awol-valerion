@@ -16,7 +16,6 @@ from ucapi_framework import Entity, create_entity_id
 
 from uc_intg_awol_valerion.config import AwolValerionConfig
 from uc_intg_awol_valerion.const import (
-    MEDIA_PLAYER_STATE_MAPPING,
     AwolValerionStates,
     Loggers,
     SimpleCommands,
@@ -26,18 +25,12 @@ from uc_intg_awol_valerion.simple_commands import get_simple_command_map
 
 _LOG = logging.getLogger(Loggers.MEDIA_PLAYER)
 
-FEATURES = [
-    media_player.Features.ON_OFF,
-    media_player.Features.DPAD,
-    media_player.Features.TOGGLE,
-    media_player.Features.VOLUME,
-    media_player.Features.VOLUME_UP_DOWN,
-    media_player.Features.HOME,
-    media_player.Features.MUTE,
-    media_player.Features.UNMUTE,
-    media_player.Features.MUTE_TOGGLE,
-    media_player.Features.SELECT_SOURCE,
-]
+_MEDIA_PLAYER_STATE_MAPPING = {
+    AwolValerionStates.ON: States.ON,
+    AwolValerionStates.OFF: States.OFF,
+    AwolValerionStates.UNAVAILABLE: States.UNAVAILABLE,
+    AwolValerionStates.UNKNOWN: States.UNKNOWN,
+}
 
 
 class AwolValerionMediaPlayer(MediaPlayer, Entity):
@@ -82,7 +75,18 @@ class AwolValerionMediaPlayer(MediaPlayer, Entity):
         super().__init__(
             identifier=entity_id,
             name=f"{device_config.name} Media Player",
-            features=FEATURES,
+            features=[
+                media_player.Features.ON_OFF,
+                media_player.Features.DPAD,
+                media_player.Features.TOGGLE,
+                media_player.Features.VOLUME,
+                media_player.Features.VOLUME_UP_DOWN,
+                media_player.Features.HOME,
+                media_player.Features.MUTE,
+                media_player.Features.UNMUTE,
+                media_player.Features.MUTE_TOGGLE,
+                media_player.Features.SELECT_SOURCE,
+            ],
             attributes=device.get_device_attributes(entity_id),
             device_class=DeviceClasses.TV,
             options={
@@ -146,13 +150,13 @@ class AwolValerionMediaPlayer(MediaPlayer, Entity):
 
     def map_entity_states(self, device_state: AwolValerionStates) -> States:
         """Convert a device-specific state to a UC API entity state."""
-        return MEDIA_PLAYER_STATE_MAPPING[device_state]
+        return _MEDIA_PLAYER_STATE_MAPPING[device_state]
 
     async def sync_state(self) -> None:
         """Update the media player attributes."""
         self.update(
             {
-                MediaAttr.STATE: MEDIA_PLAYER_STATE_MAPPING[self._device.state],
+                MediaAttr.STATE: _MEDIA_PLAYER_STATE_MAPPING[self._device.state],
                 MediaAttr.SOURCE: self._device.status.input,
                 MediaAttr.SOURCE_LIST: list(self._device.status.source_list),
                 MediaAttr.VOLUME: self._device.status.volume,
