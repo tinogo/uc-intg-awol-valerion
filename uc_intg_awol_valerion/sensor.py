@@ -5,6 +5,7 @@ Sensor Entity.
 """
 
 import logging
+from dataclasses import dataclass
 from typing import Any, Callable
 
 from ucapi import EntityTypes, Sensor
@@ -21,26 +22,99 @@ from uc_intg_awol_valerion.device import AwolValerionDevice
 
 _LOG = logging.getLogger(Loggers.SENSOR)
 
-_simple_custom_sensors = {
-    SensorType.SOURCE: "Source",
-    SensorType.VOLUME: "Volume",
-    SensorType.INPUT_RESOLUTION: "Input Resolution",
-    SensorType.RECOMMENDED_RESOLUTION: "Recommended Resolution",
-    SensorType.ASPECT_RATIO: "Aspect Ratio",
-    SensorType.COLOR_TEMPERATURE: "Color Temperature",
-    SensorType.DYNAMIC_TONE_MAPPING: "Dynamic Tone Mapping",
-    SensorType.EBL: "EBL",
-    SensorType.FAN_SPEED: "Fan Speed",
-    SensorType.GAMMA: "Gamma",
-    SensorType.LASER_LUMINANCE: "Laser Luminance",
-    SensorType.MOTION_ENHANCEMENT: "Motion Enhancement",
-    SensorType.PICTURE_MODE: "Picture Mode",
-    SensorType.SIGNAL_INFO: "Signal Info",
-    SensorType.TEMPERATURE: "Temperature",
-}
 
-_binary_sensors = {
-    SensorType.MUTE: "Mute",
+@dataclass(frozen=True)
+class SensorConfig:
+    """Configuration for one sensor type."""
+
+    label: str
+    device_class: str
+    value_getter: Callable[[AwolValerionDevice], Any]
+    unit: str | None = None
+
+
+SENSOR_CONFIGS: dict[SensorType, SensorConfig] = {
+    SensorType.MUTE: SensorConfig(
+        label="Mute",
+        device_class=DeviceClasses.BINARY,
+        value_getter=lambda device: "on" if device.status.muted else "off",
+        unit="sound",
+    ),
+    SensorType.SOURCE: SensorConfig(
+        label="Source",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: device.status.input,
+    ),
+    SensorType.VOLUME: SensorConfig(
+        label="Volume",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.status.volume),
+    ),
+    SensorType.INPUT_RESOLUTION: SensorConfig(
+        label="Input Resolution",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.status.input_resolution),
+    ),
+    SensorType.RECOMMENDED_RESOLUTION: SensorConfig(
+        label="Recommended Resolution",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.identity.rec_resolution),
+    ),
+    SensorType.ASPECT_RATIO: SensorConfig(
+        label="Aspect Ratio",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.status.aspect_ratio),
+    ),
+    SensorType.COLOR_TEMPERATURE: SensorConfig(
+        label="Color Temperature",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.status.color_temperature),
+    ),
+    SensorType.DYNAMIC_TONE_MAPPING: SensorConfig(
+        label="Dynamic Tone Mapping",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.status.dynamic_tone_mapping),
+    ),
+    SensorType.EBL: SensorConfig(
+        label="EBL",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.status.ebl),
+    ),
+    SensorType.FAN_SPEED: SensorConfig(
+        label="Fan Speed",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.status.fan_speed_display),
+    ),
+    SensorType.GAMMA: SensorConfig(
+        label="Gamma",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.status.gamma),
+    ),
+    SensorType.LASER_LUMINANCE: SensorConfig(
+        label="Laser Luminance",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.status.laser_luminance),
+    ),
+    SensorType.MOTION_ENHANCEMENT: SensorConfig(
+        label="Motion Enhancement",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.status.motion_enhancement),
+    ),
+    SensorType.PICTURE_MODE: SensorConfig(
+        label="Picture Mode",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.status.picture_mode),
+    ),
+    SensorType.SIGNAL_INFO: SensorConfig(
+        label="Signal Info",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.status.signal_info),
+    ),
+    SensorType.TEMPERATURE: SensorConfig(
+        label="Temperature",
+        device_class=DeviceClasses.CUSTOM,
+        value_getter=lambda device: str(device.status.temperature_display),
+    ),
 }
 
 
@@ -50,27 +124,8 @@ class AwolValerionSensor(Sensor, Entity):  # pylint: disable=too-few-public-meth
     def __init__(self, device: AwolValerionDevice, sensor_type: SensorType):
         """Initialize the sensor entity."""
         self._device = device
-        self._sensor_type = sensor_type
-        self._entity_attribute_map: dict[SensorType, Callable] = {
-            SensorType.MUTE: self._get_mute_sensor_attributes,
-            SensorType.SOURCE: self._get_source_sensor_attributes,
-            SensorType.VOLUME: self._get_volume_sensor_attributes,
-            SensorType.INPUT_RESOLUTION: self._get_input_resolution_sensor_attributes,
-            SensorType.RECOMMENDED_RESOLUTION: self._get_recommended_resolution_sensor_attributes,
-            SensorType.ASPECT_RATIO: self._get_aspect_ratio_sensor_attributes,
-            SensorType.COLOR_TEMPERATURE: self._get_color_temperature_sensor_attributes,
-            SensorType.DYNAMIC_TONE_MAPPING: self._get_dynamic_tone_mapping_sensor_attributes,
-            SensorType.EBL: self._get_ebl_sensor_attributes,
-            SensorType.FAN_SPEED: self._get_fan_speed_sensor_attributes,
-            SensorType.GAMMA: self._get_gamma_sensor_attributes,
-            SensorType.LASER_LUMINANCE: self._get_laser_luminance_sensor_attributes,
-            SensorType.MOTION_ENHANCEMENT: self._get_motion_enhancement_sensor_attributes,
-            SensorType.PICTURE_MODE: self._get_picture_mode_sensor_attributes,
-            SensorType.SIGNAL_INFO: self._get_signal_info_sensor_attributes,
-            SensorType.TEMPERATURE: self._get_temperature_sensor_attributes,
-        }
-
         sensor_config = self._get_sensor_config(sensor_type, device)
+        self._sensor_config: SensorConfig = sensor_config["sensor_config"]
 
         _LOG.debug("Initializing sensor: %s", sensor_config["identifier"])
 
@@ -89,33 +144,23 @@ class AwolValerionSensor(Sensor, Entity):  # pylint: disable=too-few-public-meth
         self, sensor_type: SensorType, device: AwolValerionDevice
     ) -> dict[str, Any]:
         """Get sensor configuration based on type."""
-        sensor = {}
         sensor_entity_id = create_entity_id(
             EntityTypes.SENSOR,
             device.identifier,
             sensor_type,
         )
 
-        match sensor_type:
-            case sensor_type if _simple_custom_sensors.get(sensor_type) is not None:
-                sensor = {
-                    "identifier": sensor_entity_id,
-                    "name": f"{device.name} Sensor: {_simple_custom_sensors.get(sensor_type)}",
-                    "device_class": DeviceClasses.CUSTOM,
-                    "attributes": self._device.get_device_attributes(sensor_entity_id),
-                }
+        config = SENSOR_CONFIGS.get(sensor_type)
+        if config is None:
+            raise ValueError(f"Unsupported sensor type: {sensor_type}")
 
-            case sensor_type if _binary_sensors.get(sensor_type) is not None:
-                sensor = {
-                    "identifier": sensor_entity_id,
-                    "name": f"{device.name} Sensor: {_binary_sensors.get(sensor_type)}",
-                    "device_class": DeviceClasses.BINARY,
-                    "attributes": self._device.get_device_attributes(sensor_entity_id),
-                }
-
-            case _:
-                raise ValueError(f"Unsupported sensor type: {sensor_type}")
-        return sensor
+        return {
+            "identifier": sensor_entity_id,
+            "name": f"{device.name} Sensor: {config.label}",
+            "device_class": config.device_class,
+            "attributes": self._device.get_device_attributes(sensor_entity_id),
+            "sensor_config": config,
+        }
 
     def map_entity_states(self, device_state: AwolValerionDevice) -> States:
         """Convert a device-specific state to a UC API entity state."""
@@ -123,121 +168,14 @@ class AwolValerionSensor(Sensor, Entity):  # pylint: disable=too-few-public-meth
 
     async def sync_state(self) -> None:
         """Update the sensor attributes."""
-        attributes = self._entity_attribute_map.get(self._sensor_type)
-        if attributes is not None:
-            self.update(attributes())
-        else:
-            raise ValueError(f"Unsupported sensor type: {self._sensor_type}")
+        self.update(self._get_sensor_attributes())
 
-    def _get_mute_sensor_attributes(self) -> dict[str, Any]:
-        """Get the mute sensor attributes."""
-        return {
+    def _get_sensor_attributes(self) -> dict[str, Any]:
+        """Build UC API attributes from the active sensor config."""
+        attributes = {
             SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: "on" if self._device.status.muted else "off",
-            SensorAttr.UNIT: "sound",
+            SensorAttr.VALUE: self._sensor_config.value_getter(self._device),
         }
-
-    def _get_source_sensor_attributes(self) -> dict[str, Any]:
-        """Get the source sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: self._device.status.input,
-        }
-
-    def _get_volume_sensor_attributes(self) -> dict[str, Any]:
-        """Get the volume sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.volume),
-        }
-
-    def _get_input_resolution_sensor_attributes(self) -> dict[str, Any]:
-        """Get the input resolution sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.input_resolution),
-        }
-
-    def _get_recommended_resolution_sensor_attributes(self) -> dict[str, Any]:
-        """Get the recommended resolution sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.identity.rec_resolution),
-        }
-
-    def _get_aspect_ratio_sensor_attributes(self) -> dict[str, Any]:
-        """Get the aspect ratio sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.aspect_ratio),
-        }
-
-    def _get_color_temperature_sensor_attributes(self) -> dict[str, Any]:
-        """Get the color temperature sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.color_temperature),
-        }
-
-    def _get_dynamic_tone_mapping_sensor_attributes(self) -> dict[str, Any]:
-        """Get the dynamic tone mapping sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.dynamic_tone_mapping),
-        }
-
-    def _get_ebl_sensor_attributes(self) -> dict[str, Any]:
-        """Get the EBL sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.ebl),
-        }
-
-    def _get_fan_speed_sensor_attributes(self) -> dict[str, Any]:
-        """Get the fan speed sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.fan_speed_display),
-        }
-
-    def _get_gamma_sensor_attributes(self) -> dict[str, Any]:
-        """Get the gamma sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.gamma),
-        }
-
-    def _get_laser_luminance_sensor_attributes(self) -> dict[str, Any]:
-        """Get the laser luminance sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.laser_luminance),
-        }
-
-    def _get_motion_enhancement_sensor_attributes(self) -> dict[str, Any]:
-        """Get the motion enhancement sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.motion_enhancement),
-        }
-
-    def _get_picture_mode_sensor_attributes(self) -> dict[str, Any]:
-        """Get the picture mode sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.picture_mode),
-        }
-
-    def _get_signal_info_sensor_attributes(self) -> dict[str, Any]:
-        """Get the signal info sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.signal_info),
-        }
-
-    def _get_temperature_sensor_attributes(self) -> dict[str, Any]:
-        """Get the temperature sensor attributes."""
-        return {
-            SensorAttr.STATE: SENSOR_STATE_MAPPING[self._device.state],
-            SensorAttr.VALUE: str(self._device.status.temperature_display),
-        }
+        if self._sensor_config.unit is not None:
+            attributes[SensorAttr.UNIT] = self._sensor_config.unit
+        return attributes
