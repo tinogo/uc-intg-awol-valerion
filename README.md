@@ -59,6 +59,7 @@ This integration provides the following Select-Types:
 - Changing the Dynamic Tone Mapping
 - Changing the EBL mode
 - Changing the Gamma curve
+- Changing the Laser luminance
 - Changing the Motion Enhancement mode
 - Changing the Picture mode
 

@@ -90,6 +90,7 @@ class AwolValerionCommands(StrEnum):
     SET_DYNAMIC_TONE_MAPPING = "%3DYTM {}"
     SET_EBL = "%3ENBL {}"
     SET_GAMMA = "%3GAMA {}"
+    SET_LASER_LUMINANCE = "%3LASL {}"
     SET_MOTION_ENHANCEMENT = "%3MOTN {}"
     SET_PICTURE_MODE = "%3PICT {}"
     SET_POWER_ON = "%1POWR 1"
@@ -118,6 +119,7 @@ class SelectType(StrEnum):
     DYNAMIC_TONE_MAPPING = "dynamic_tone_mapping"
     EBL = "ebl"
     GAMMA = "gamma"
+    LASER_LUMINANCE = "laser_luminance"
     MOTION_ENHANCEMENT = "motion_enhancement"
     PICTURE_MODE = "picture_mode"
 

@@ -29,6 +29,7 @@ _selects = {
     SelectType.DYNAMIC_TONE_MAPPING: "Dynamic Tone Mapping",
     SelectType.EBL: "EBL",
     SelectType.GAMMA: "Gamma",
+    SelectType.LASER_LUMINANCE: "Laser Luminance",
     SelectType.MOTION_ENHANCEMENT: "Motion Enhancement",
     SelectType.PICTURE_MODE: "Picture Mode",
 }
@@ -50,6 +51,7 @@ class AwolValerionSelect(Select, Entity):
             SelectType.DYNAMIC_TONE_MAPPING: self._get_dynamic_tone_mapping_select_attributes,
             SelectType.EBL: self._get_ebl_select_attributes,
             SelectType.GAMMA: self._get_gamma_select_attributes,
+            SelectType.LASER_LUMINANCE: self._get_laser_luminance_select_attributes,
             SelectType.MOTION_ENHANCEMENT: self._get_motion_enhancement_select_attributes,
             SelectType.PICTURE_MODE: self._get_picture_mode_select_attributes,
         }
@@ -58,6 +60,7 @@ class AwolValerionSelect(Select, Entity):
             SelectType.DYNAMIC_TONE_MAPPING: AwolValerionCommands.SET_DYNAMIC_TONE_MAPPING,
             SelectType.EBL: AwolValerionCommands.SET_EBL,
             SelectType.GAMMA: AwolValerionCommands.SET_GAMMA,
+            SelectType.LASER_LUMINANCE: AwolValerionCommands.SET_LASER_LUMINANCE,
             SelectType.MOTION_ENHANCEMENT: AwolValerionCommands.SET_MOTION_ENHANCEMENT,
             SelectType.PICTURE_MODE: AwolValerionCommands.SET_PICTURE_MODE,
         }
@@ -130,6 +133,8 @@ class AwolValerionSelect(Select, Entity):
                 return self._device.status.ebl_list.get(option)
             case SelectType.GAMMA:
                 return self._device.status.gamma_list.get(option)
+            case SelectType.LASER_LUMINANCE:
+                return option
             case SelectType.MOTION_ENHANCEMENT:
                 return self._device.status.motion_enhancement_list.get(option)
             case SelectType.PICTURE_MODE:
@@ -236,6 +241,14 @@ class AwolValerionSelect(Select, Entity):
             SelectAttr.OPTIONS: list(
                 self._device.status.motion_enhancement_list.keys()
             ),
+        }
+
+    def _get_laser_luminance_select_attributes(self) -> dict[str, Any]:
+        """Get the laser luminance select attributes."""
+        return {
+            SelectAttr.STATE: SELECT_STATE_MAPPING[self._device.state],
+            SelectAttr.CURRENT_OPTION: self._device.status.laser_luminance,
+            SelectAttr.OPTIONS: list(range(0, 11)),
         }
 
     def _get_picture_mode_select_attributes(self) -> dict[str, Any]:
