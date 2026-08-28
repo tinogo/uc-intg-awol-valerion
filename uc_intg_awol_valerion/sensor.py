@@ -8,6 +8,7 @@ Sensor Entity.
 
 import logging
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Any, Callable
 
 from ucapi import EntityTypes, Sensor
@@ -18,7 +19,6 @@ from ucapi_framework import Entity, create_entity_id
 from uc_intg_awol_valerion.const import (
     AwolValerionStates,
     Loggers,
-    SensorType,
 )
 from uc_intg_awol_valerion.device import AwolValerionDevice
 
@@ -30,6 +30,27 @@ _SENSOR_STATE_MAPPING = {
     AwolValerionStates.UNAVAILABLE: States.UNAVAILABLE,
     AwolValerionStates.UNKNOWN: States.UNKNOWN,
 }
+
+
+class SensorType(StrEnum):
+    """Defines the supported sensor types for AWOL Valerion projectors."""
+
+    MUTE = "mute"
+    SOURCE = "source"
+    VOLUME = "volume"
+    INPUT_RESOLUTION = "input_resolution"
+    RECOMMENDED_RESOLUTION = "recommended_resolution"
+    ASPECT_RATIO = "aspect_ratio"
+    COLOR_TEMPERATURE = "color_temperature"
+    DYNAMIC_TONE_MAPPING = "dynamic_tone_mapping"
+    EBL = "ebl"
+    FAN_SPEED = "fan_speed"
+    GAMMA = "gamma"
+    LASER_LUMINANCE = "laser_luminance"
+    MOTION_ENHANCEMENT = "motion_enhancement"
+    PICTURE_MODE = "picture_mode"
+    SIGNAL_INFO = "signal_info"
+    TEMPERATURE = "temperature"
 
 
 @dataclass(frozen=True)

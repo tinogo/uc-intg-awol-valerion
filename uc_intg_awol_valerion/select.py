@@ -8,6 +8,7 @@ Select Entity.
 
 import logging
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Any, Callable, Literal
 
 from ucapi import EntityTypes, Select, StatusCodes
@@ -20,7 +21,6 @@ from uc_intg_awol_valerion.const import (
     AwolValerionCommands,
     AwolValerionStates,
     Loggers,
-    SelectType,
 )
 from uc_intg_awol_valerion.device import AwolValerionDevice
 
@@ -32,6 +32,18 @@ _SELECT_STATE_MAPPING = {
     AwolValerionStates.UNAVAILABLE: States.UNAVAILABLE,
     AwolValerionStates.UNKNOWN: States.UNKNOWN,
 }
+
+
+class SelectType(StrEnum):
+    """Defines the supported select types for AWOL Valerion projectors."""
+
+    COLOR_TEMPERATURE = "color_temperature"
+    DYNAMIC_TONE_MAPPING = "dynamic_tone_mapping"
+    EBL = "ebl"
+    GAMMA = "gamma"
+    LASER_LUMINANCE = "laser_luminance"
+    MOTION_ENHANCEMENT = "motion_enhancement"
+    PICTURE_MODE = "picture_mode"
 
 
 @dataclass(frozen=True)

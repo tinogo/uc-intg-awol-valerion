@@ -105,36 +105,3 @@ class AwolValerionCommands(StrEnum):
     SET_VOLUME_DOWN = "%2SVOL 0"
     SET_VOLUME_UP = "%2SVOL 1"
     SET_VOLUME_X_FORMAT = "%3VOLM {}"
-
-
-class SelectType(StrEnum):
-    """Defines the supported select types for AWOl Valerion projectors."""
-
-    COLOR_TEMPERATURE = "color_temperature"
-    DYNAMIC_TONE_MAPPING = "dynamic_tone_mapping"
-    EBL = "ebl"
-    GAMMA = "gamma"
-    LASER_LUMINANCE = "laser_luminance"
-    MOTION_ENHANCEMENT = "motion_enhancement"
-    PICTURE_MODE = "picture_mode"
-
-
-class SensorType(StrEnum):
-    """Defines the supported sensor types for AWOL Valerion projectors."""
-
-    MUTE = "mute"
-    SOURCE = "source"
-    VOLUME = "volume"
-    INPUT_RESOLUTION = "input_resolution"
-    RECOMMENDED_RESOLUTION = "recommended_resolution"
-    ASPECT_RATIO = "aspect_ratio"
-    COLOR_TEMPERATURE = "color_temperature"
-    DYNAMIC_TONE_MAPPING = "dynamic_tone_mapping"
-    EBL = "ebl"
-    FAN_SPEED = "fan_speed"
-    GAMMA = "gamma"
-    LASER_LUMINANCE = "laser_luminance"
-    MOTION_ENHANCEMENT = "motion_enhancement"
-    PICTURE_MODE = "picture_mode"
-    SIGNAL_INFO = "signal_info"
-    TEMPERATURE = "temperature"

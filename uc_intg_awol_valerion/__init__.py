@@ -14,12 +14,12 @@ import os
 from ucapi_framework import BaseConfigManager, BaseIntegrationDriver, get_config_path
 
 from uc_intg_awol_valerion.config import AwolValerionConfig
-from uc_intg_awol_valerion.const import Loggers, SelectType, SensorType
+from uc_intg_awol_valerion.const import Loggers
 from uc_intg_awol_valerion.device import AwolValerionDevice
 from uc_intg_awol_valerion.media_player import AwolValerionMediaPlayer
 from uc_intg_awol_valerion.remote import AwolValerionRemote
-from uc_intg_awol_valerion.select import AwolValerionSelect
-from uc_intg_awol_valerion.sensor import AwolValerionSensor
+from uc_intg_awol_valerion.select import AwolValerionSelect, SelectType
+from uc_intg_awol_valerion.sensor import AwolValerionSensor, SensorType
 from uc_intg_awol_valerion.setup import AwolValerionSetupFlow
 
 
