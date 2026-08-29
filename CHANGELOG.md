@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.0.2](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.0.1...v1.0.2) (2026-08-29)
+
+
+### Documentation
+
+* add an AGENTS.md file ([6be1719](https://github.com/tinogo/uc-intg-awol-valerion/commit/6be17195e6a63f145a7bf0d83f7caff41be173c5))
+
+
+### Miscellaneous
+
+* **deps:** Update the dependencies ([2e3f4e3](https://github.com/tinogo/uc-intg-awol-valerion/commit/2e3f4e3c8191f6a2dff93f4fb7cb8af57e7400c2))
+* update the uv version to 0.12.7 ([6e02ea9](https://github.com/tinogo/uc-intg-awol-valerion/commit/6e02ea99fce07e42d4bd58733c7448e9cbf5be9a))
+
 ## [1.0.1](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.0.0...v1.0.1) (2026-08-28)
 
 
