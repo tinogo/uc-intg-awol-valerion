@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.1.0...v1.1.1) (2026-08-29)
+
+
+### Bug Fixes
+
+* correctly handle the available gamma and dynamic tone mapping select options ([72f3499](https://github.com/tinogo/uc-intg-awol-valerion/commit/72f34994804a6d7c432150cf7d85d1b72d18d23a))
+
 ## [1.1.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.0.2...v1.1.0) (2026-08-29)
 
 
