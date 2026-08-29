@@ -273,7 +273,7 @@ class PJLinkStatus:
         fan_1, fan_2 = self.fan_rpm_values
         if fan_1 is None or fan_2 is None:
             return None
-        return f"FAN 1: {fan_1} RPM | FAN 2: {fan_2} RPM"
+        return f"F1: {fan_1} RPM, F2: {fan_2} RPM"
 
     @property
     def temperature_values(self) -> tuple[str | None, str | None]:
@@ -292,7 +292,7 @@ class PJLinkStatus:
         temp_1, temp_2 = self.temperature_values
         if temp_1 is None or temp_2 is None:
             return None
-        return f"Temp 1: {temp_1}°C | Temp 2: {temp_2}°C"
+        return f"T1: {temp_1}°C, T2: {temp_2}°C"
 
 
 @dataclass
