@@ -91,7 +91,7 @@ SELECT_CONFIGS: dict[SelectType, SelectConfig] = {
         get_current_option=lambda device: device.status.gamma,
         get_options=lambda device: (
             list(device.status.gamma_list.keys())
-            if device.status.signal_info.hdr is False
+            if device.status.signal_info and device.status.signal_info.hdr is False
             else []
         ),
         map_option_to_device_value=lambda device, option: device.status.gamma_list.get(
