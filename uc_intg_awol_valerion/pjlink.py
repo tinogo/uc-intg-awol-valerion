@@ -344,58 +344,88 @@ class PJLinkClient:
             return None
         return value
 
+    @dataclass
+    class _Session:
+        reader: asyncio.StreamReader
+        writer: asyncio.StreamWriter
+
     async def _send(self, command: str) -> str:
         """Open a connection, (optionally) authenticate, send one command, read reply."""
         async with self._lock:
-            reader, writer = await asyncio.wait_for(
-                asyncio.open_connection(self._host, self._port), timeout=_TIMEOUT
-            )
+            session = await self._open_session()
             try:
-                greeting = (
-                    (await asyncio.wait_for(reader.read(64), timeout=_TIMEOUT))
-                    .decode("utf-8", errors="replace")
-                    .strip()
-                )
+                return await self._send_on_session(session, command)
+            finally:
+                await self._close_session(session)
 
-                payload = command
-                if greeting.startswith("PJLINK 1"):
-                    parts = greeting.split(" ")
-                    if len(parts) < 3:
-                        raise PJLinkError("Malformed authentication challenge")
-                    seed = parts[2].strip()
+    async def _open_session(self) -> _Session:
+        """Open one authenticated PJLink session."""
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(self._host, self._port), timeout=_TIMEOUT
+        )
+        try:
+            greeting = (
+                (await asyncio.wait_for(reader.read(64), timeout=_TIMEOUT))
+                .decode("utf-8", errors="replace")
+                .strip()
+            )
 
-                    digest = hashlib.md5(
-                        (self._password + seed).encode("utf-8")
-                    ).hexdigest()
+            if greeting.startswith("PJLINK 1"):
+                parts = greeting.split(" ")
+                if len(parts) < 3:
+                    raise PJLinkError("Malformed authentication challenge")
+                seed = parts[2].strip()
+                digest = hashlib.md5(
+                    (self._password + seed).encode("utf-8")
+                ).hexdigest()
 
-                    writer.write(f"{digest}\r".encode("utf-8"))
-                    await writer.drain()
-                    raw = await asyncio.wait_for(reader.read(256), timeout=_TIMEOUT)
-                    response = raw.decode("utf-8", errors="replace").strip()
-
-                    if "PJLINK ERRA" in response:
-                        raise PJLinkAuthError("Invalid PJLink password")
-                elif greeting.startswith("PJLINK ERRA"):
-                    raise PJLinkAuthError("Authentication required")
-
-                _LOG.debug("[%s] Sending: %s", self._host, payload)
-
-                writer.write(f"{payload}\r".encode("utf-8"))
+                writer.write(f"{digest}\r".encode("utf-8"))
                 await writer.drain()
                 raw = await asyncio.wait_for(reader.read(256), timeout=_TIMEOUT)
                 response = raw.decode("utf-8", errors="replace").strip()
-
-                _LOG.debug("[%s] Received: %s", self._host, response)
-
                 if "PJLINK ERRA" in response:
                     raise PJLinkAuthError("Invalid PJLink password")
-                return response
-            finally:
-                writer.close()
-                try:
-                    await writer.wait_closed()
-                except Exception:  # pylint: disable=broad-exception-caught
-                    pass
+            elif greeting.startswith("PJLINK ERRA"):
+                raise PJLinkAuthError("Authentication required")
+
+            return PJLinkClient._Session(reader=reader, writer=writer)
+        except Exception:
+            writer.close()
+            try:
+                await writer.wait_closed()
+            except Exception:  # pylint: disable=broad-exception-caught
+                pass
+            raise
+
+    async def _close_session(self, session: _Session) -> None:
+        """Close an open PJLink session."""
+        session.writer.close()
+        try:
+            await session.writer.wait_closed()
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+
+    async def _send_on_session(self, session: _Session, command: str) -> str:
+        """Send one command over an already-open PJLink session."""
+        _LOG.debug("[%s] Sending: %s", self._host, command)
+        session.writer.write(f"{command}\r".encode("utf-8"))
+        await session.writer.drain()
+        raw = await asyncio.wait_for(session.reader.read(256), timeout=_TIMEOUT)
+        response = raw.decode("utf-8", errors="replace").strip()
+        _LOG.debug("[%s] Received: %s", self._host, response)
+        if "PJLINK ERRA" in response:
+            raise PJLinkAuthError("Invalid PJLink password")
+        return response
+
+    async def _send_and_get_value_on_session(
+        self, session: _Session, command: str
+    ) -> str | None:
+        """Send a command on an open session and return its parsed value."""
+        response = await self._send_on_session(session, command)
+        value = self._value(response)
+        if self._is_err(value):
+            return None
+        return value
 
     @staticmethod
     def _value(response: str) -> str | None:
@@ -422,93 +452,116 @@ class PJLinkClient:
             return AwolValerionStates.UNAVAILABLE
         return PJLINK_POWER.get(value, AwolValerionStates.UNAVAILABLE)
 
-    async def get_mute(self) -> bool:
-        """Return True if the projector's audio output is muted."""
-        value = await self._send_and_get_value(AwolValerionCommands.GET_AVMUTE)
-        return value in AVMUTE_MUTED
-
-    async def get_volume(self) -> int:
-        """Return the current volume of the projector."""
-        value = await self._send_and_get_value(AwolValerionCommands.GET_VOLUME)
-        if value is None:
-            return 0
-        return int(value)
-
     async def poll(self) -> PJLinkStatus:
         """Fetch a full dynamic snapshot; sets ``reachable`` on TCP success."""
         status = PJLinkStatus()
-        try:
-            status.power = await self.get_power()
-            status.reachable = status.power != AwolValerionStates.UNAVAILABLE
-        except PJLinkAuthError:
-            raise
-        except (OSError, asyncio.TimeoutError, PJLinkError) as err:
-            _LOG.debug("[%s] PJLink unreachable: %s", self._host, err)
-            return status
-
-        if status.power in (
-            AwolValerionStates.ON,
-            AwolValerionStates.UNKNOWN,
-        ):
+        async with self._lock:
             try:
-                status.input_id = await self._send_and_get_value(
-                    AwolValerionCommands.GET_INPUT
+                session = await self._open_session()
+            except PJLinkAuthError:
+                raise
+            except (OSError, asyncio.TimeoutError, PJLinkError) as err:
+                _LOG.debug("[%s] PJLink unreachable: %s", self._host, err)
+                return status
+
+            try:
+                power_value = await self._send_and_get_value_on_session(
+                    session, AwolValerionCommands.GET_POWER
                 )
-                status.muted = await self.get_mute()
-                status.volume = await self.get_volume()
-                status.input_resolution = await self._send_and_get_value(
-                    AwolValerionCommands.GET_INPUT_RESOLUTION
-                )
-                status.aspect_ratio_id = await self._send_and_get_value(
-                    AwolValerionCommands.GET_ASPECT_RATIO
-                )
-                status.color_temperature_id = await self._send_and_get_value(
-                    AwolValerionCommands.GET_COLOR_TEMPERATURE
-                )
-                status.dynamic_tone_mapping_id = await self._send_and_get_value(
-                    AwolValerionCommands.GET_DYNAMIC_TONE_MAPPING
-                )
-                status.ebl_id = await self._send_and_get_value(
-                    AwolValerionCommands.GET_EBL
-                )
-                status.fan_speed = await self._send_and_get_value(
-                    AwolValerionCommands.GET_FAN_SPEED
-                )
-                status.gamma_id = await self._send_and_get_value(
-                    AwolValerionCommands.GET_GAMMA
-                )
-                status.laser_luminance = await self._send_and_get_value(
-                    AwolValerionCommands.GET_LASER_LUMINANCE
-                )
-                status.motion_enhancement_id = await self._send_and_get_value(
-                    AwolValerionCommands.GET_MOTION_ENHANCEMENT
-                )
-                status.picture_mode = await self._send_and_get_value(
-                    AwolValerionCommands.GET_PICTURE_MODE
-                )
-                status.signal_info = await self._get_signal_info()
-                status.temperature = await self._send_and_get_value(
-                    AwolValerionCommands.GET_TEMPERATURE
-                )
-                status.picture_mode_list = await self._get_picture_mode_list()
+                if power_value is None:
+                    status.power = AwolValerionStates.UNAVAILABLE
+                else:
+                    status.power = PJLINK_POWER.get(
+                        power_value, AwolValerionStates.UNAVAILABLE
+                    )
+                status.reachable = status.power != AwolValerionStates.UNAVAILABLE
+
+                if status.power in (AwolValerionStates.ON, AwolValerionStates.UNKNOWN):
+                    status.input_id = await self._send_and_get_value_on_session(
+                        session, AwolValerionCommands.GET_INPUT
+                    )
+                    status.muted = (
+                        await self._send_and_get_value_on_session(
+                            session, AwolValerionCommands.GET_AVMUTE
+                        )
+                        in AVMUTE_MUTED
+                    )
+                    volume_value = await self._send_and_get_value_on_session(
+                        session, AwolValerionCommands.GET_VOLUME
+                    )
+                    status.volume = 0 if volume_value is None else int(volume_value)
+                    status.input_resolution = await self._send_and_get_value_on_session(
+                        session, AwolValerionCommands.GET_INPUT_RESOLUTION
+                    )
+                    status.aspect_ratio_id = await self._send_and_get_value_on_session(
+                        session, AwolValerionCommands.GET_ASPECT_RATIO
+                    )
+                    status.color_temperature_id = (
+                        await self._send_and_get_value_on_session(
+                            session, AwolValerionCommands.GET_COLOR_TEMPERATURE
+                        )
+                    )
+                    status.dynamic_tone_mapping_id = (
+                        await self._send_and_get_value_on_session(
+                            session, AwolValerionCommands.GET_DYNAMIC_TONE_MAPPING
+                        )
+                    )
+                    status.ebl_id = await self._send_and_get_value_on_session(
+                        session, AwolValerionCommands.GET_EBL
+                    )
+                    status.fan_speed = await self._send_and_get_value_on_session(
+                        session, AwolValerionCommands.GET_FAN_SPEED
+                    )
+                    status.gamma_id = await self._send_and_get_value_on_session(
+                        session, AwolValerionCommands.GET_GAMMA
+                    )
+                    status.laser_luminance = await self._send_and_get_value_on_session(
+                        session, AwolValerionCommands.GET_LASER_LUMINANCE
+                    )
+                    status.motion_enhancement_id = (
+                        await self._send_and_get_value_on_session(
+                            session, AwolValerionCommands.GET_MOTION_ENHANCEMENT
+                        )
+                    )
+                    status.picture_mode = await self._send_and_get_value_on_session(
+                        session, AwolValerionCommands.GET_PICTURE_MODE
+                    )
+                    status.signal_info = await self._get_signal_info_on_session(session)
+                    status.temperature = await self._send_and_get_value_on_session(
+                        session, AwolValerionCommands.GET_TEMPERATURE
+                    )
+                    status.picture_mode_list = (
+                        await self._get_picture_mode_list_on_session(session)
+                    )
+            except PJLinkAuthError:
+                raise
             except (OSError, asyncio.TimeoutError, PJLinkError):
                 pass
+            finally:
+                await self._close_session(session)
         return status
 
     async def get_identity(self) -> PJLinkIdentity:
         """Query the static device information (name, model, inputs...)."""
         identity = PJLinkIdentity()
+        async with self._lock:
+            session = await self._open_session()
+            try:
 
-        async def _q(command: str) -> str:
-            value = await self._send_and_get_value(command)
-            return "" if value is None else value
+                async def _q(command: str) -> str:
+                    value = await self._send_and_get_value_on_session(session, command)
+                    return "" if value is None else value
 
-        identity.name = await _q(AwolValerionCommands.GET_NAME)
-        identity.manufacturer = await _q(AwolValerionCommands.GET_MANUFACTURER)
-        identity.product = await _q(AwolValerionCommands.GET_PRODUCT)
-        identity.other_info = await _q(AwolValerionCommands.GET_OTHER_INFO)
-        identity.sw_version = await _q(AwolValerionCommands.GET_SW_VERSION)
-        identity.rec_resolution = await _q(AwolValerionCommands.GET_REC_RESOLUTION)
+                identity.name = await _q(AwolValerionCommands.GET_NAME)
+                identity.manufacturer = await _q(AwolValerionCommands.GET_MANUFACTURER)
+                identity.product = await _q(AwolValerionCommands.GET_PRODUCT)
+                identity.other_info = await _q(AwolValerionCommands.GET_OTHER_INFO)
+                identity.sw_version = await _q(AwolValerionCommands.GET_SW_VERSION)
+                identity.rec_resolution = await _q(
+                    AwolValerionCommands.GET_REC_RESOLUTION
+                )
+            finally:
+                await self._close_session(session)
 
         return identity
 
@@ -533,31 +586,25 @@ class PJLinkClient:
             else AwolValerionCommands.SET_MUTE_OFF
         )
 
-    async def _get_picture_mode_list(self) -> list[str]:
-        picture_modes = await self._send_and_get_value(
-            AwolValerionCommands.GET_PICTURE_MODE_LIST
+    async def _get_picture_mode_list_on_session(self, session: _Session) -> list[str]:
+        picture_modes = await self._send_and_get_value_on_session(
+            session, AwolValerionCommands.GET_PICTURE_MODE_LIST
         )
-
         if picture_modes is not None:
             return picture_modes.split(",")
-
         return []
 
-    async def _get_signal_info(self) -> SignalInfo | None:
-        raw_signal_info = await self._send_and_get_value(
-            AwolValerionCommands.GET_SIGNAL_INFO
+    async def _get_signal_info_on_session(self, session: _Session) -> SignalInfo | None:
+        raw_signal_info = await self._send_and_get_value_on_session(
+            session, AwolValerionCommands.GET_SIGNAL_INFO
         )
-
         if raw_signal_info is not None:
-            # Split the raw signal info into components
             components = raw_signal_info.split(" ")
             if len(components) == 6:
                 hdr = components[4] != "0"
                 color_space = components[1]
                 resolution = components[0]
-
                 return SignalInfo(hdr, color_space, resolution)
-
         return None
 
     async def send_raw(self, command: str) -> str:
