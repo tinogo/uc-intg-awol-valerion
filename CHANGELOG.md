@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.1.1...v1.2.0) (2026-08-29)
+
+
+### Features
+
+* batch some query commands to reduce the latency ([da4b6b2](https://github.com/tinogo/uc-intg-awol-valerion/commit/da4b6b2032f3a1e1b161065105f414786a4a0f95))
+
 ## [1.1.1](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.1.0...v1.1.1) (2026-08-29)
 
 
