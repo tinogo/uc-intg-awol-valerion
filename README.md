@@ -116,7 +116,6 @@ The major changes found in each new release are listed in the [changelog](https:
 │   ├── config.py            # device configuration dataclass
 │   ├── const.py             # Constants
 │   ├── device.py            # Device communication and state management
-│   ├── driver.py            # Integration Driver
 │   ├── media_player.py      # Media player entity
 │   ├── pjlink.py            # The basic PJLink-client communicating with the AWOL Valerion projectors
 │   ├── remote.py            # Remote entity
