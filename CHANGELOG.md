@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.1.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.0.2...v1.1.0) (2026-08-29)
+
+
+### Features
+
+* Pretty print the signal info ([b980d08](https://github.com/tinogo/uc-intg-awol-valerion/commit/b980d087b239ecd12960277fc51968f7ea94a463))
+
+
+### Bug Fixes
+
+* **ci-cd:** Revert the mutable releases as release-please seems to have a bug with draft releases ([bff99ee](https://github.com/tinogo/uc-intg-awol-valerion/commit/bff99ee1a4b6cb6abeb488c5c2548266fd754401))
+* Do not allow changing the gamma value for HDR signals ([4805a51](https://github.com/tinogo/uc-intg-awol-valerion/commit/4805a51ce96f2ef959a18e859bae570ba20a98cb))
+* harden against some possible errors ([f0f083e](https://github.com/tinogo/uc-intg-awol-valerion/commit/f0f083ee03a8f658a4e702a5953c7d2482d793ce))
+
+
+### Miscellaneous
+
+* Make the Fan Speed and Temperature sensor values a bit more compact ([e285479](https://github.com/tinogo/uc-intg-awol-valerion/commit/e285479890e3a06b8357bfe6bbabc9c3326f128d))
+
 ## [1.0.2](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.0.1...v1.0.2) (2026-08-29)
 
 
