@@ -71,7 +71,7 @@ SELECT_CONFIGS: dict[SelectType, SelectConfig] = {
         label="Dynamic Tone Mapping",
         command_template=AwolValerionCommands.SET_DYNAMIC_TONE_MAPPING,
         get_current_option=lambda device: device.status.dynamic_tone_mapping,
-        get_options=lambda device: list(device.status.dynamic_tone_mapping_list.keys()),
+        get_options=lambda device: device.status.allowed_dynamic_tone_mapping_list,
         map_option_to_device_value=lambda device, option: (
             device.status.dynamic_tone_mapping_list.get(option)
         ),
@@ -89,11 +89,7 @@ SELECT_CONFIGS: dict[SelectType, SelectConfig] = {
         label="Gamma",
         command_template=AwolValerionCommands.SET_GAMMA,
         get_current_option=lambda device: device.status.gamma,
-        get_options=lambda device: (
-            list(device.status.gamma_list.keys())
-            if device.status.signal_info and device.status.signal_info.hdr is False
-            else []
-        ),
+        get_options=lambda device: device.status.allowed_gamma_list,
         map_option_to_device_value=lambda device, option: device.status.gamma_list.get(
             option
         ),

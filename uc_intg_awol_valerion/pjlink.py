@@ -229,6 +229,13 @@ class PJLinkStatus:
             return None
 
     @property
+    def allowed_dynamic_tone_mapping_list(self) -> list[str]:
+        """Return the list of allowed dynamic tone mapping modes based on the current signal info."""
+        if self.signal_info and self.signal_info.hdr is True:
+            return list(self.dynamic_tone_mapping_list.keys())
+        return []
+
+    @property
     def gamma(self) -> str | None:
         """Return the current pretty printed Gamma mode."""
         if self.gamma_id is None:
@@ -240,6 +247,13 @@ class PJLinkStatus:
             ]
         except ValueError:
             return None
+
+    @property
+    def allowed_gamma_list(self) -> list[str]:
+        """Return the list of allowed gamma modes based on the current signal info."""
+        if self.signal_info and self.signal_info.hdr is False:
+            return list(self.gamma_list.keys())[:4]
+        return []
 
     @property
     def motion_enhancement(self) -> str | None:
