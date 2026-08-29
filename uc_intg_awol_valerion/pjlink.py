@@ -43,6 +43,30 @@ class PJLinkAuthError(PJLinkError):
 
 
 @dataclass
+class SignalInfo:
+    """Contains the current signal info of the currentl playing media."""
+
+    hdr: bool = False
+    color_space: str = ""
+    resolution: str = ""
+
+    @property
+    def pretty_print(self) -> str:
+        """Return a human-friendly string representation of the signal info."""
+        hdr_str = "HDR" if self.hdr else "SDR"
+
+        match self.color_space:
+            case "0":
+                color_space_str = "Rec.709"
+            case "2":
+                color_space_str = "BT.2020"
+            case _:
+                color_space_str = self.color_space
+
+        return f"{self.resolution} | {hdr_str} | {color_space_str}"
+
+
+@dataclass
 class PJLinkStatus:
     """A polled snapshot of the projector's dynamic state."""
 
@@ -127,7 +151,7 @@ class PJLinkStatus:
     )
     picture_mode: str | None = None
     picture_mode_list: list[str] = field(default_factory=lambda: [])
-    signal_info: str | None = None
+    signal_info: SignalInfo | None = None
     temperature: str | None = None
 
     @property
@@ -448,9 +472,7 @@ class PJLinkClient:
                 status.picture_mode = await self._send_and_get_value(
                     AwolValerionCommands.GET_PICTURE_MODE
                 )
-                status.signal_info = await self._send_and_get_value(
-                    AwolValerionCommands.GET_SIGNAL_INFO
-                )
+                status.signal_info = await self._get_signal_info()
                 status.temperature = await self._send_and_get_value(
                     AwolValerionCommands.GET_TEMPERATURE
                 )
@@ -506,6 +528,23 @@ class PJLinkClient:
             return picture_modes.split(",")
 
         return []
+
+    async def _get_signal_info(self) -> SignalInfo | None:
+        raw_signal_info = await self._send_and_get_value(
+            AwolValerionCommands.GET_SIGNAL_INFO
+        )
+
+        if raw_signal_info is not None:
+            # Split the raw signal info into components
+            components = raw_signal_info.split(" ")
+            if len(components) == 6:
+                hdr = components[4] != "0"
+                color_space = components[1]
+                resolution = components[0]
+
+                return SignalInfo(hdr, color_space, resolution)
+
+        return None
 
     async def send_raw(self, command: str) -> str:
         """Send a raw PJLink command string (e.g. ``%1INPT 32``)."""

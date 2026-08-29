@@ -138,7 +138,7 @@ SENSOR_CONFIGS: dict[SensorType, SensorConfig] = {
     SensorType.SIGNAL_INFO: SensorConfig(
         label="Signal Info",
         device_class=DeviceClasses.CUSTOM,
-        value_getter=lambda device: str(device.status.signal_info),
+        value_getter=lambda device: str(device.status.signal_info.pretty_print),
     ),
     SensorType.TEMPERATURE: SensorConfig(
         label="Temperature",
