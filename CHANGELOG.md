@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.2.2...v1.2.3) (2026-09-05)
+
+
+### Bug Fixes
+
+* fix the direct execution of the entry point instead of a python module ([6b37926](https://github.com/tinogo/uc-intg-awol-valerion/commit/6b37926db014ed1b6abb1c43e7ab7060e0047638))
+
 ## [1.2.2](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.2.1...v1.2.2) (2026-09-05)
 
 
