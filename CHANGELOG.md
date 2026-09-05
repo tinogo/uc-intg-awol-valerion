@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.4](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.2.3...v1.2.4) (2026-09-05)
+
+
+### Miscellaneous
+
+* apply some minor cleanup ([2332a6f](https://github.com/tinogo/uc-intg-awol-valerion/commit/2332a6fa90b9b55468b1faba833fb928047222e2))
+
 ## [1.2.3](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.2.2...v1.2.3) (2026-09-05)
 
 
