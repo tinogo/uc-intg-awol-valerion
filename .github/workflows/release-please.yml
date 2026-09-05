@@ -55,7 +55,7 @@ jobs:
 
       - name: Build
         if: ${{ steps.release.outputs.release_created }}
-        run: uv run pyinstaller --clean --onedir --name intg-${{ env.DRIVER_ID }} --collect-all zeroconf uc_intg_${{ env.INTG_NAME }}/__init__.py
+        run: uv run pyinstaller --clean --onedir --name intg-${{ env.DRIVER_ID }} --collect-all zeroconf uc_intg_${{ env.INTG_NAME }}/__main__.py
 
       - name: Prepare artifacts
         if: ${{ steps.release.outputs.release_created }}
