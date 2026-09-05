@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.1](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.2.0...v1.2.1) (2026-09-05)
+
+
+### Bug Fixes
+
+* Fix the run script entry point ([3c2acfe](https://github.com/tinogo/uc-intg-awol-valerion/commit/3c2acfecddcde5bb80d32afe9f64ebfb598f35e8))
+
+
+### Miscellaneous
+
+* **ci-cd:** require the pyinstaller package directly ([d1f740e](https://github.com/tinogo/uc-intg-awol-valerion/commit/d1f740e676c7b853771c969ce179b95880721693))
+* **ci-cd:** update the setup-uv actions ([6d443e7](https://github.com/tinogo/uc-intg-awol-valerion/commit/6d443e7b839ffed26505c3352e0ca8adf844147b))
+* **deps:** Update the dependencies ([325b3dc](https://github.com/tinogo/uc-intg-awol-valerion/commit/325b3dcbb99bd87fa2bfd5439c39b4f195ab431a))
+
 ## [1.2.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.1.1...v1.2.0) (2026-08-29)
 
 
