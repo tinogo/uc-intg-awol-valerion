@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.2](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.2.1...v1.2.2) (2026-09-05)
+
+
+### Bug Fixes
+
+* Fix a typo ([455df4d](https://github.com/tinogo/uc-intg-awol-valerion/commit/455df4d274ccf3e07e04c912013deed30b6ded23))
+* switch the entry point for the pyinstaller build to __main__.py ([00b3bac](https://github.com/tinogo/uc-intg-awol-valerion/commit/00b3bac62dd0f87aff3be26accd274840485d5f2))
+
 ## [1.2.1](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.2.0...v1.2.1) (2026-09-05)
 
 
