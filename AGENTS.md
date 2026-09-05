@@ -171,8 +171,9 @@ uv sync
 # Install git hooks
 uv run pre-commit install
 
-# Run integration locally
+# Run integration locally (choose one)
 python -m uc_intg_awol_valerion                 # As Python module
+python uc_intg_awol_valerion                    # As a directory/script
 
 # Or via Docker Compose
 docker compose up --remove-orphans --build --watch --pull=always
@@ -445,6 +446,7 @@ __main__.py → main()
 
 **Entry Points:**
 - `python -m uc_intg_awol_valerion` - via `__main__.py`
+- `python uc_intg_awol_valerion` - via `__main__.py` (directory execution)
 
 
 ### 2. Device Addition (Setup)
