@@ -171,10 +171,8 @@ uv sync
 # Install git hooks
 uv run pre-commit install
 
-# Run integration locally (choose one)
-uv run uc_intg_awol_valerion/__init__.py        # Via __init__.py
+# Run integration locally
 python -m uc_intg_awol_valerion                 # As Python module
-uc-intg-awol-valerion                          # Via installed script entry point
 
 # Or via Docker Compose
 docker compose up --remove-orphans --build --watch --pull=always
@@ -427,12 +425,12 @@ Used in `remote.py` and `media_player.py` to dispatch simple command requests.
 
 ## Integration Flows
 
-### 1. Startup (`__init__.py` and `__main__.py`)
+### 1. Startup (`__main__.py` and `__init__.py`)
 
 The integration initializes via `main()` function in `__init__.py`:
 
 ```
-__main__.py or __init__.py → main()
+__main__.py → main()
   ├─ Setup logging from UC_LOG_LEVEL env (default: DEBUG)
   ├─ Initialize BaseIntegrationDriver with:
   │  ├─ device_class: AwolValerionDevice
@@ -447,8 +445,6 @@ __main__.py or __init__.py → main()
 
 **Entry Points:**
 - `python -m uc_intg_awol_valerion` - via `__main__.py`
-- `uv run uc_intg_awol_valerion/__init__.py` - direct via __init__.py
-- `uc-intg-awol-valerion` - via script entry point (after `uv sync`)
 
 
 ### 2. Device Addition (Setup)

@@ -10,12 +10,6 @@ RUN mkdir /config
 ADD driver.json .
 ADD uc_intg_awol_valerion ./uc_intg_awol_valerion
 
-# Network configuration
-ENV UC_DISABLE_MDNS_PUBLISH="false"
-ENV UC_MDNS_LOCAL_HOSTNAME=""
-ENV UC_INTEGRATION_INTERFACE="0.0.0.0"
-ENV UC_INTEGRATION_HTTP_PORT="9090"
-
 # Configuration path
 ENV UC_CONFIG_HOME="/config"
 

@@ -23,7 +23,7 @@ from uc_intg_awol_valerion.sensor import AwolValerionSensor, SensorType
 from uc_intg_awol_valerion.setup import AwolValerionSetupFlow
 
 
-async def main():
+async def _run():
     """Start the Remote Two/3 integration driver."""
     logging.basicConfig()
 
@@ -67,5 +67,6 @@ async def main():
     await asyncio.Future()
 
 
-if __name__ == "__main__":
-    asyncio.run(main())
+def main():
+    """Start the entry point in a synchronous fashion."""
+    asyncio.run(_run())

@@ -153,7 +153,7 @@ The major changes found in each new release are listed in the [changelog](https:
 4. Run the integration either locally or via a Compose environment:
    1. Locally:
       ```bash
-      uv run uc_intg_awol_valerion/__init__.py
+      uv run python -m uc_intg_awol_valerion
       ```
    2. via Compose:
       ```bash

@@ -29,8 +29,5 @@ dev = [
     "pylint>=4.0.4",
 ]
 
-[project.scripts]
-uc-intg-awol-valerion = "uc_intg_awol_valerion:main"
-
 [tool.uv]
 required-version = ">=0.12.7"
