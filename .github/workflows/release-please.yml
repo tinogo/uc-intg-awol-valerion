@@ -14,8 +14,6 @@ permissions:
 
 env:
   INTG_NAME: awol_valerion
-  # Python version to use in the builder image. See https://hub.docker.com/r/unfoldedcircle/r2-pyinstaller for possible versions.
-  PYTHON_VER: 3.11.13-0.6.0
 
 jobs:
   release-please:
@@ -36,11 +34,6 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
         uses: actions/checkout@v7
 
-      - name: Get version and id
-        if: ${{ steps.release.outputs.release_created }}
-        run: |
-          echo "DRIVER_ID=$(jq .driver_id -r driver.json)" >> $GITHUB_ENV
-
       - name: Install Python
         if: ${{ steps.release.outputs.release_created }}
         uses: actions/setup-python@v7
@@ -52,6 +45,11 @@ jobs:
       - name: Install the dependencies
         if: ${{ steps.release.outputs.release_created }}
         run: uv sync
+
+      - name: Get version and id
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          echo "DRIVER_ID=$(jq .driver_id -r driver.json)" >> $GITHUB_ENV
 
       - name: Build
         if: ${{ steps.release.outputs.release_created }}
