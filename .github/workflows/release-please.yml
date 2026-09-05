@@ -41,19 +41,21 @@ jobs:
         run: |
           echo "DRIVER_ID=$(jq .driver_id -r driver.json)" >> $GITHUB_ENV
 
+      - name: Install Python
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-python@v7
+
+      - name: Install UV
+        if: ${{ steps.release.outputs.release_created }}
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install the dependencies
+        if: ${{ steps.release.outputs.release_created }}
+        run: uv sync
+
       - name: Build
         if: ${{ steps.release.outputs.release_created }}
-        run: |
-          echo "Starting pyinstaller build"
-          docker run --rm --name builder \
-            --platform=linux/arm64/v8 \
-            --user=$(id -u):$(id -g) \
-            -v ${GITHUB_WORKSPACE}:/workspace \
-            docker.io/unfoldedcircle/r2-pyinstaller:${{ env.PYTHON_VER }} \
-            bash -c \
-            "cd /workspace && \
-              python -m pip install -r requirements.txt && \
-              pyinstaller --clean --onedir --name intg-${{ env.DRIVER_ID }} --collect-all zeroconf uc_intg_${{ env.INTG_NAME }}/__init__.py"
+        run: uv run pyinstaller --clean --onedir --name intg-${{ env.DRIVER_ID }} --collect-all zeroconf uc_intg_${{ env.INTG_NAME }}/__init__.py
 
       - name: Prepare artifacts
         if: ${{ steps.release.outputs.release_created }}
