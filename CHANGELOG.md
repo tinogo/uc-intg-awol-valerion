@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.2.4...v1.3.0) (2026-09-06)
+
+
+### Features
+
+* **ci-cd:** Re-enable immutable release support ([110ebf6](https://github.com/tinogo/uc-intg-awol-valerion/commit/110ebf6b24ae120a6b3d7046cf7fd17beb2a08d1))
+
 ## [1.2.4](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.2.3...v1.2.4) (2026-09-05)
 
 
