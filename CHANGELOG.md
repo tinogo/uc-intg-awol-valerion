@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.2](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.3.1...v1.3.2) (2026-10-19)
+
+
+### Miscellaneous
+
+* **deps:** bump astral-sh/setup-uv from 10.2.0 to 10.3.0 in /.github/workflows ([#52](https://github.com/tinogo/uc-intg-awol-valerion/issues/52)) ([5f80d3a](https://github.com/tinogo/uc-intg-awol-valerion/commit/5f80d3aac735ca243064ee3b040dfa50a7d126c0))
+* **deps:** update the 3rd party dependencies ([5365616](https://github.com/tinogo/uc-intg-awol-valerion/commit/5365616533cf775f6e6e36af049269e0b65e5f86))
+* update uv to version 0.13.1 ([10bbf19](https://github.com/tinogo/uc-intg-awol-valerion/commit/10bbf192e0a1cac18e595180b424bccc36978d45))
+
 ## [1.3.1](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.3.0...v1.3.1) (2026-10-01)
 
 
