@@ -44,7 +44,7 @@ class PJLinkAuthError(PJLinkError):
 
 @dataclass
 class SignalInfo:
-    """Contains the current signal info of the currentl playing media."""
+    """Contains the current signal info of the currently playing media."""
 
     hdr: bool = False
     color_space: str = ""
