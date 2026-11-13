@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.3.3](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.3.2...v1.3.3) (2026-11-13)
+
+
+### Bug Fixes
+
+* Fix the local execution of the integration via Docker Compose ([2f9d142](https://github.com/tinogo/uc-intg-awol-valerion/commit/2f9d142b63e175dee0b6ccad204463d01dc943b2))
+
+
+### Miscellaneous
+
+* **deps:** bump astral-sh/setup-uv from 10.3.0 to 10.3.2 in /.github/workflows ([#58](https://github.com/tinogo/uc-intg-awol-valerion/issues/58)) ([f674ecf](https://github.com/tinogo/uc-intg-awol-valerion/commit/f674ecfc0bddb4302ef3d40d0ac0a6e108864447))
+* **deps:** bump astral-sh/setup-uv from 10.3.2 to 10.3.3 in /.github/workflows ([#62](https://github.com/tinogo/uc-intg-awol-valerion/issues/62)) ([d3cb3ad](https://github.com/tinogo/uc-intg-awol-valerion/commit/d3cb3adc872ad77becca482c807dd9952b5ecac5))
+* **deps:** Update to Python 3.14 + update the 3rd party packages ([5b01a82](https://github.com/tinogo/uc-intg-awol-valerion/commit/5b01a8283c71d58882642f6b8bf1e1cf4d233701))
+* Fix the code style ([0270cd7](https://github.com/tinogo/uc-intg-awol-valerion/commit/0270cd72218e9fb2bd96e09867d614eed8ea53f3))
+
 ## [1.3.2](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.3.1...v1.3.2) (2026-10-19)
 
 
