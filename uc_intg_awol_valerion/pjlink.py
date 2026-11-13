@@ -535,7 +535,7 @@ class PJLinkClient:
                     )
             except PJLinkAuthError:
                 raise
-            except (OSError, asyncio.TimeoutError, PJLinkError):
+            except OSError, asyncio.TimeoutError, PJLinkError:
                 pass
             finally:
                 await self._close_session(session)
