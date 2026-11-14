@@ -1,6 +1,6 @@
-# Unfolded Circle Integration AWOL Valerion
+# Unfolded Circle Integration AWOL Link
 
-This repository contains the source code for the [Unfolded Circle Remote Two/3](https://www.unfoldedcircle.com/) integration driver for AWOL Valerion projectors.
+This repository contains the source code for the [Unfolded Circle Remote Two/3](https://www.unfoldedcircle.com/) integration driver for projectors supporting the AWOL Link protocol.
 
 The integration is based on the amazing work of JackJPowell's [ucapi-framework](https://github.com/jackjpowell/ucapi-framework).
 
@@ -8,14 +8,22 @@ It also heavily borrows code from the [Epson projector integration](https://gith
 
 ## Table of contents
 
-1. [Supported entity types](#supported-entity-types)
-2. [Installation instructions](#installation-instructions)
-3. [Update instructions](#update-instructions)
-4. [Versioning](#versioning)
-5. [Changelog](#changelog)
-6. [Development](#development)
-7. [Resources](#resources)
-8. [License](#license)
+1. [Supported devices](#supported-devices)
+2. [Supported entity types](#supported-entity-types)
+3. [Installation instructions](#installation-instructions)
+4. [Update instructions](#update-instructions)
+5. [Versioning](#versioning)
+6. [Changelog](#changelog)
+7. [Development](#development)
+8. [Resources](#resources)
+9. [License](#license)
+
+## Supported devices
+
+The integration supports the following devices:
+
+- AWOL Valerion projectors with the "AWOL Link" feature enabled (requires Q0718 firmware or later).
+- AWOL Aetherion projectors with the "AWOL Link" feature enabled (requires Q1015 firmware or later).
 
 ## Supported entity types
 
