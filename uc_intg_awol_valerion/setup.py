@@ -21,22 +21,22 @@ _LOG = logging.getLogger(Loggers.SETUP_FLOW)
 
 # This form is displayed when the user chooses manual device entry
 _MANUAL_INPUT_SCHEMA = RequestUserInput(
-    {"en": "AWOL Valerion Setup"},
+    {"en": "AWOL Link Setup"},
     [
         {
             "id": "info",
             "label": {
-                "en": "Setup your AWOL Valerion projector",
-                "de": "Einrichtung deines AWOL Valerion Projektors",
+                "en": "Set up your projector supporting AWOL Link",
+                "de": "Einrichtung deines Projektors welcher AWOL Link unterstützt",
             },
             "field": {
                 "label": {
                     "value": {
                         "en": (
-                            "Please enter the IP Address or hostname of your AWOL Valerion projector."
+                            "Please enter the IP Address or hostname of your AWOL Valerion/Aetherion projector."
                         ),
                         "de": (
-                            "Bitte gebe die IP-Adresse oder den Hostnamen deines AWOL Valerion Projektors an."
+                            "Bitte gebe die IP-Adresse oder den Hostnamen deines AWOL Valerion/Aetherion Projektors an."
                         ),
                     }
                 }
@@ -62,8 +62,8 @@ _MANUAL_INPUT_SCHEMA = RequestUserInput(
             "field": {"password": {"value": ""}},
             "id": "password",
             "label": {
-                "en": "Optional password of the AWOL-Link connection",
-                "de": "Optionales Passwort der AWOL-Link Verbindung",
+                "en": "Optional password of the AWOL Link connection",
+                "de": "Optionales Passwort der AWOL Link Verbindung",
             },
         },
     ],
