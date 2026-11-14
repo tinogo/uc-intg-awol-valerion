@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.4.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.3.3...v1.4.0) (2026-11-14)
+
+
+### Features
+
+* Add support for AWOL Aetherion projectors ([ba7bc99](https://github.com/tinogo/uc-intg-awol-valerion/commit/ba7bc9984126638a869d80cb7d476e487052dfa6))
+* Document the Aetherion support in the Readme ([ea11194](https://github.com/tinogo/uc-intg-awol-valerion/commit/ea1119493e5c171fdf61f63d8ec0551407cef65d))
+
+
+### Documentation
+
+* Fix a typo ([84977b3](https://github.com/tinogo/uc-intg-awol-valerion/commit/84977b34b055ada19f738229d2177718cfa330e4))
+
+
+### Miscellaneous
+
+* Update the Setup instructions to mention Aetherion projectors as well ([21d44f0](https://github.com/tinogo/uc-intg-awol-valerion/commit/21d44f0b3d081df07cd723d34c0b2da7b2620593))
+
 ## [1.3.3](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.3.2...v1.3.3) (2026-11-13)
 
 
