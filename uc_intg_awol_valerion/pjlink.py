@@ -31,6 +31,22 @@ PJLINK_POWER = {
 # PJLink AV-mute reply codes (``%1AVMT=<n>``): 30 off, 11/21/31 muted
 AVMUTE_MUTED = {"21"}
 
+INPUT_NAMES: dict[str, str] = {
+    "30": "Home",
+    "31": "HDMI 1",
+    "32": "HDMI 2",
+    "33": "HDMI 3",
+    "34": "DP",
+    "35": "AV",
+}
+EBL_LIST_VALERION: dict[str, str] = {
+    "Off": "0",
+    "Low": "1",
+    "Medium": "2",
+    "High": "3",
+}
+EBL_LIST_AETHERION: dict[str, str] = {"Off": "0", "On": "4"}
+
 _TIMEOUT = 4.0
 
 
@@ -73,14 +89,7 @@ class PJLinkStatus:
     power: AwolValerionStates = AwolValerionStates.UNAVAILABLE
     reachable: bool = False
     input_id: str | None = None
-    input_list: dict[str, str] = field(
-        default_factory=lambda: {
-            "Home": "30",
-            "HDMI 1": "31",
-            "HDMI 2": "32",
-            "HDMI 3": "33",
-        }
-    )
+    input_list: dict[str, str] = field(default_factory=dict)
     muted: bool = False
     volume: int = 0
     input_resolution: str | None = None
@@ -117,14 +126,7 @@ class PJLinkStatus:
         }
     )
     ebl_id: str | None = None
-    ebl_list: dict[str, str] = field(
-        default_factory=lambda: {
-            "Off": "0",
-            "Low": "1",
-            "Medium": "2",
-            "High": "3",
-        }
-    )
+    ebl_list: dict[str, str] = field(default_factory=dict)
     fan_speed: str | None = None
     gamma_id: str | None = None
     gamma_list: dict[str, str] = field(
@@ -319,6 +321,21 @@ class PJLinkIdentity:
     other_info: str = ""
     sw_version: str = ""
     rec_resolution: str = ""
+    input_ids: list[str] = field(default_factory=list)
+
+    @property
+    def is_aetherion(self) -> bool:
+        """Return True if the product name (``%1INF2``) identifies an Aetherion."""
+        return "aetherion" in self.product.casefold()
+
+    def apply_to_status(self, status: PJLinkStatus) -> None:
+        """Adapt the status' model-dependent option lists to this projector."""
+        status.ebl_list = dict(
+            EBL_LIST_AETHERION if self.is_aetherion else EBL_LIST_VALERION
+        )
+        status.input_list = {
+            INPUT_NAMES.get(code, f"Input {code}"): code for code in self.input_ids
+        }
 
 
 class PJLinkClient:
@@ -330,6 +347,7 @@ class PJLinkClient:
         self._port = port
         self._password = password or ""
         self._lock = asyncio.Lock()
+        self._identity = PJLinkIdentity()
 
     @property
     def host(self) -> str:
@@ -455,6 +473,7 @@ class PJLinkClient:
     async def poll(self) -> PJLinkStatus:
         """Fetch a full dynamic snapshot; sets ``reachable`` on TCP success."""
         status = PJLinkStatus()
+        self._identity.apply_to_status(status)
         async with self._lock:
             try:
                 session = await self._open_session()
@@ -560,9 +579,13 @@ class PJLinkClient:
                 identity.rec_resolution = await _q(
                     AwolValerionCommands.GET_REC_RESOLUTION
                 )
+                identity.input_ids = (
+                    await _q(AwolValerionCommands.GET_INPUT_LIST)
+                ).split()
             finally:
                 await self._close_session(session)
 
+        self._identity = identity
         return identity
 
     # -- commands -----------------------------------------------------------

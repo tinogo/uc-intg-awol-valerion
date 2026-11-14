@@ -59,6 +59,7 @@ class AwolValerionCommands(StrEnum):
 
     GET_POWER = "%1POWR ?"
     GET_INPUT = "%1INPT ?"
+    GET_INPUT_LIST = "%1INST ?"
     GET_AVMUTE = "%1AVMT ?"
     GET_NAME = "%1NAME ?"
     GET_MANUFACTURER = "%1INF1 ?"
