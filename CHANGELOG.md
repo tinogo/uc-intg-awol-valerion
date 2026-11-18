@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.4.1...v1.4.2) (2026-11-18)
+
+
+### Miscellaneous
+
+* Change the layer order ([83de806](https://github.com/tinogo/uc-intg-awol-valerion/commit/83de8065093cc11abb6c14b13cb328e014202223))
+
 ## [1.4.1](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.4.0...v1.4.1) (2026-11-18)
 
 
