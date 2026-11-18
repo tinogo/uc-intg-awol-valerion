@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.4.1](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.4.0...v1.4.1) (2026-11-18)
+
+
+### Documentation
+
+* Update the AGENTS.md ([e09ac77](https://github.com/tinogo/uc-intg-awol-valerion/commit/e09ac7787e8a9936f06de2b1ca48f5cc09173f4c))
+
+
+### Miscellaneous
+
+* **deps:** rework the dependabot config ([955de86](https://github.com/tinogo/uc-intg-awol-valerion/commit/955de86203eea9e1317664ecfa23508d8e4fbbd7))
+* **deps:** update the package dependencies ([4c8618a](https://github.com/tinogo/uc-intg-awol-valerion/commit/4c8618ac07bf81df2f9528629e63cb823dcbb9dc))
+* get rid of the requirements.txt ([272b109](https://github.com/tinogo/uc-intg-awol-valerion/commit/272b1091d4f47180e8f4d4ad1da84a74e0235225))
+
 ## [1.4.0](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.3.3...v1.4.0) (2026-11-14)
 
 
