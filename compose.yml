@@ -31,7 +31,10 @@ services:
        - integration-data:/config
      develop:
        watch:
-         - path: ./requirements.txt
+         - path: ./pyproject.toml
+           action: rebuild
+
+         - path: ./uv.lock
            action: rebuild
 
          - path: uc_intg_awol_valerion

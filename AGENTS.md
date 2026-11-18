@@ -41,5 +41,5 @@ There is no automated test suite or single-test runner in the repository. To run
 - Selects and sensors are factory-created from `SelectType`/`SensorType` enums and configuration maps in their respective modules. Add a type to both its enum and config map; the driver instantiates every enum member.
 - The remote and media player dispatch simple commands through `simple_commands.py`. When adding a supported simple action, keep the command enum, map, device method, and entity handler consistent.
 - Device commands should refresh/publish state through the existing device flow after a successful change. Polling is serialized by the device connection lock; PJLink requests are also serialized by the client.
-- Preserve the project’s configured style: 120-character lines, double-quoted strings, and import ordering checked by isort. For dependency changes, use UV and keep `pyproject.toml`, `uv.lock`, and exported `requirements.txt` in sync as described in `README.md`.
+- Preserve the project’s configured style: 120-character lines, double-quoted strings, and import ordering checked by isort. Manage dependencies with UV; declare them in `pyproject.toml` and keep `uv.lock` current.
 - The setup UI has English and German translations; update both when changing user-facing setup text.

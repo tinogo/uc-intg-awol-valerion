@@ -3,12 +3,13 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-COPY ./requirements.txt requirements.txt
-RUN uv pip install --no-cache-dir -r requirements.txt --system
-RUN mkdir /config
+COPY ./pyproject.toml ./uv.lock ./
+RUN uv sync --locked --no-dev --no-install-project
+ENV PATH="/app/.venv/bin:$PATH"
 
-ADD driver.json .
-ADD uc_intg_awol_valerion ./uc_intg_awol_valerion
+COPY ./uc_intg_awol_valerion ./uc_intg_awol_valerion
+COPY ./driver.json .
+RUN mkdir /config
 
 # Configuration path
 ENV UC_CONFIG_HOME="/config"

@@ -2,5 +2,5 @@
 # Docker entrypoint script
 
 cd /usr/src/app
-pip install --no-cache-dir -q -r requirements.txt
-python -m uc_intg_awol_valerion
+uv sync --locked --no-dev
+uv run --no-sync python -m uc_intg_awol_valerion
