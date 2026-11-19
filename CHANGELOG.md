@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.3](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.4.2...v1.4.3) (2026-11-19)
+
+
+### Bug Fixes
+
+* Add the missing support for the ON, OFF and TOOGLE Remote-Entity commands ([6d7b0ba](https://github.com/tinogo/uc-intg-awol-valerion/commit/6d7b0ba8d20c575a6eeb79a1b1ed8bcf83b29737))
+
+
+### Miscellaneous
+
+* **deps:** Update to uv version 0.13.9 ([638dd3a](https://github.com/tinogo/uc-intg-awol-valerion/commit/638dd3a61dc39cf6fd98c3d15468db9a06dfff8b))
+
 ## [1.4.2](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.4.1...v1.4.2) (2026-11-18)
 
 
