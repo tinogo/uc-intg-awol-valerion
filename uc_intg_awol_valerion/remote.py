@@ -73,7 +73,7 @@ class AwolValerionRemote(Remote, Entity):
 
         self.subscribe_to_device(device)
 
-    async def handle_command(
+    async def handle_command(  # pylint: disable=too-many-branches
         self,
         entity: Remote,
         cmd_id: str,
@@ -101,6 +101,15 @@ class AwolValerionRemote(Remote, Entity):
             match cmd_id:
                 case cmd_id if cmd_id in self._command_map:
                     await self._command_map[cmd_id]()
+
+                case remote.Commands.ON:
+                    await self._device.power_on()
+
+                case remote.Commands.OFF:
+                    await self._device.power_off()
+
+                case remote.Commands.TOGGLE:
+                    await self._device.power_toggle()
 
                 case remote.Commands.SEND_CMD:
                     if params:
