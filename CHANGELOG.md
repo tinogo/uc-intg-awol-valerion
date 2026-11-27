@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.4](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.4.3...v1.4.4) (2026-11-27)
+
+
+### Miscellaneous
+
+* **deps:** bump astral-sh/setup-uv from 10.3.3 to 10.4.0 in the github-actions group ([#75](https://github.com/tinogo/uc-intg-awol-valerion/issues/75)) ([30ab212](https://github.com/tinogo/uc-intg-awol-valerion/commit/30ab212c2ce932632ab68022f815f1a387eadb1b))
+
 ## [1.4.3](https://github.com/tinogo/uc-intg-awol-valerion/compare/v1.4.2...v1.4.3) (2026-11-19)
 
 
